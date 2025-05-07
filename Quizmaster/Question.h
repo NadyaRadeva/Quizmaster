@@ -15,6 +15,12 @@ public:
 	Question& operator=(Question&& other) noexcept;
 	~Question();
 
+	void setQuestionText(const char* questionText);
+	void setPoints(size_t points);
+
+	const char* getQuestionText() const;
+	size_t getPoints() const;
+
 private:
 	char* questionText;
 	size_t points;
@@ -22,7 +28,7 @@ private:
 	void copyFrom(const Question& other);
 	void moveFrom(Question&& other) noexcept;
 	void freeQuestionText();
-	void free();
+	void freeQuestion();
 };
 
 #endif // !_QUESTION_H
