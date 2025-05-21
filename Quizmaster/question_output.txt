@@ -1,0 +1,2 @@
+C++ supports multiple inheritance.
+1
