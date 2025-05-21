@@ -26,7 +26,10 @@ size_t MyString::calcStrLen(const char* str) const {
 }
 
 void MyString::myStrCpy(char* dest, const char* src) {
-    if (!dest || !src) throw std::invalid_argument("myStrCpy: null argument.");
+    if (!dest || !src) {
+        throw std::invalid_argument("myStrCpy: null argument.");
+    }
+
     while (*src) {
         *dest++ = *src++;
     }
@@ -186,7 +189,6 @@ std::istream& operator>>(std::istream& in, MyString& input) {
 
     return in;
 }
-
 
 std::ostream& operator<<(std::ostream& out, const MyString& output) {
     return out << (output.str ? output.str : "");
