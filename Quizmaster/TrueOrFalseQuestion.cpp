@@ -8,9 +8,14 @@ bool TrueOrFalseQuestion::getCorrectAnswer() const {
 	return this->correctAnswer;
 }
 
-int TrueOrFalseQuestion::answerEvaluation() {
+double TrueOrFalseQuestion::answerEvaluation() {
+	std::cout << "Enter your answer (true/t and and false/f) :";
 	MyString userInput;
+	std::cout << "Enter your answer: ";
 	std::cin >> userInput;
+	if (!std::cin) {
+		throw std::invalid_argument("Invalid input type!");
+	}
 
 	userInput = userInput.toLower();
 
@@ -41,7 +46,7 @@ void TrueOrFalseQuestion::saveToFile(const char* filename) const {
 	}
 
 	file << this->getQuestionText() << std::endl;
-	file << this->correctAnswer << std::endl;
+	file << "True/False" << std::endl;
 
 	file.close();
 }

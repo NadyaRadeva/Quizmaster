@@ -128,18 +128,26 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MatchingPairsQuestion.cpp" />
+    <ClCompile Include="MultipleChoiceQuestion.cpp" />
     <ClCompile Include="MyString.cpp" />
+    <ClCompile Include="MyVector.cpp" />
     <ClCompile Include="Question.cpp" />
     <ClCompile Include="Quiz.cpp" />
     <ClCompile Include="QuizTypes.cpp" />
+    <ClCompile Include="ShortAnswerQuestion.cpp" />
     <ClCompile Include="SingleChoiceQuestion.cpp" />
     <ClCompile Include="TrueOrFalseQuestion.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MatchingPairsQuestion.h" />
+    <ClInclude Include="MultipleChoiceQuestion.h" />
     <ClInclude Include="MyString.h" />
+    <ClInclude Include="MyVector.hpp" />
     <ClInclude Include="Question.h" />
     <ClInclude Include="Quiz.h" />
     <ClInclude Include="QuizTypes.h" />
+    <ClInclude Include="ShortAnswerQuestion.h" />
     <ClInclude Include="SingleChoiceQuestion.h" />
     <ClInclude Include="TrueOrFalseQuestion.h" />
   </ItemGroup>
