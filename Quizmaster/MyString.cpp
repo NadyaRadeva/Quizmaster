@@ -112,6 +112,40 @@ bool MyString::operator!=(const MyString& other) const {
     return !(*this == other);
 }
 
+MyString& MyString::operator+=(char c) {
+    size_t len = this->getLength();
+
+    char* newStr = new char[len + 2];
+
+    for (size_t i = 0; i < len; ++i) {
+        newStr[i] = this->str[i];
+    }
+
+    newStr[len] = c;
+    newStr[len + 1] = '\0';
+
+    delete[] this->str;
+
+    this->str = newStr;
+    this->len = len + 1;
+
+    return *this;
+}
+
+char& MyString::operator[](size_t index) {
+    if (index >= this->len) {
+        throw std::out_of_range("Index out of bounds in MyString!");
+    }
+    return this->str[index];
+}
+
+const char& MyString::operator[](size_t index) const {
+    if (index >= this->len) {
+        throw std::out_of_range("Index out of bounds in MyString!");
+    }
+    return this->str[index];
+}
+
 void MyString::print() const {
     std::cout << (this->str ? this->str : "[null]") << std::endl;
 }
@@ -178,6 +212,32 @@ void MyString::free() {
         this->str = nullptr;
     }
     this->len = 0;
+}
+
+bool MyString::isDigit(char ch) {
+    return ch >= '0' && ch < '9';
+}
+
+bool MyString::isNumber() {
+    for (size_t i = 0; i < this->getLength(); ++i) {
+        if (!isDigit(this->str[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+MyString MyString::removeSpaces() const {
+    MyString result;
+
+    for (size_t i = 0; i < this->getLength(); ++i) {
+        if ((*this)[i] != ' ') {
+            result += (*this)[i];
+        }
+    }
+
+    return result;
 }
 
 std::istream& operator>>(std::istream& in, MyString& input) {

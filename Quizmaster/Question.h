@@ -18,7 +18,7 @@ public:
 	const MyString& getQuestionText() const;
 	size_t getTotalPoints() const;
 
-	virtual int answerEvaluation() = 0;
+	virtual double answerEvaluation() = 0;
 	virtual Question* clone() const = 0;
 	virtual void saveToFile(const char* filename) const = 0;
 

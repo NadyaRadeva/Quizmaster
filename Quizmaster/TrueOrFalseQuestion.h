@@ -14,7 +14,7 @@ public:
 	void setCorrectAnswer(bool correctAnswer);
 	bool getCorrectAnswer() const;
 
-	int answerEvaluation() override;
+	double answerEvaluation() override;
 	Question* clone() const override;
 	void saveToFile(const char* filename) const override;
 

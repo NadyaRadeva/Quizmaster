@@ -6,7 +6,8 @@
 
 const int TO_LOWER_CASE_CHANGE = 'a' - 'A';
 const int TO_UPPER_CASE_CHANGE = 'A' - 'a';
-const size_t MAX_BUFFER_SIZE = 1024;
+
+const size_t MAX_BUFFER_SIZE = 10000;
 
 class MyString {
 public:
@@ -27,6 +28,8 @@ public:
 	void myStrCpy(char* dest, const char* src);
 	void myStrCat(char* first, const char* second);
 	int myStrCmp(const char* str1, const char* str2) const;
+	bool isNumber();
+	MyString removeSpaces() const;
 
 	//Case insensitivity
 	bool isLowerCase(char ch) const;
@@ -35,12 +38,16 @@ public:
 	char toUpperCaseChar(char ch) const;
 	MyString toLower() const;
 	MyString toUpper() const;
+	
 
 	//Operator overloading
 	bool operator==(const MyString& str) const;
 	bool operator!=(const MyString& str) const;
+	MyString& operator+=(char c);
 	friend std::istream& operator>>(std::istream& in, MyString& input);
 	friend std::ostream& operator<<(std::ostream& out, const MyString& output);
+	char& operator[](size_t index);
+	const char& operator[](size_t index) const;
 
 	void print() const;
 
@@ -51,6 +58,8 @@ private:
 	void copyFrom(const MyString& other);
 	void moveFrom(MyString&& other) noexcept;
 	void free();
+
+	bool isDigit(char ch);
 };
 
 #endif // !_MYSTRING_H

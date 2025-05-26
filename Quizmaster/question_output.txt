@@ -1,2 +1,5 @@
-C++ supports multiple inheritance.
-1
+What is the capital of France?
+A) Berlin;
+B) Madrid;
+C) Paris;
+D) Rome
