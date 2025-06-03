@@ -133,9 +133,7 @@ Question* MultipleChoiceQuestion::clone() const {
     return new MultipleChoiceQuestion(*this);
 }
 
-void MultipleChoiceQuestion::saveToFile(const char* filename) const {
-    std::ofstream file(filename);
-
+void MultipleChoiceQuestion::saveToFile(std::ofstream& file) const {
     if (!file.is_open()) {
         throw std::invalid_argument("Error opening file for writing!");
     }
@@ -144,6 +142,4 @@ void MultipleChoiceQuestion::saveToFile(const char* filename) const {
     for (size_t i = 0; i < this->options.getVectorSize() - 1; ++i) {
         file << char((int)'A' + i) << ") " << this->options[i] << std::endl;
     }
-
-    file.close();
 }

@@ -24,20 +24,12 @@ Question* SingleChoiceQuestion::clone() const {
 	return new SingleChoiceQuestion(*this);
 }
 
-void SingleChoiceQuestion::saveToFile(const char* filename) const {
-	std::ofstream file(filename);
-
-	if (!file.is_open()) {
-		throw std::invalid_argument("Error opening file for writing!");
-	}
-
+void SingleChoiceQuestion::saveToFile(std::ofstream& file) const {
 	file << this->getQuestionText() << "?" << std::endl;
 	file << "A) " << this->getOptionA() << ";" << std::endl;
 	file << "B) " << this->getOptionB() << ";" << std::endl;
 	file << "C) " << this->getOptionC() << ";" << std::endl;
 	file << "D) " << this->getOptionD() << std::endl;
-
-	file.close();
 }
 
 SingleChoiceQuestion::SingleChoiceQuestion(const MyString& questionText, size_t totalPoints, const MyString& answerA, const MyString& answerB, const MyString& answerC, const MyString& answerD, char correctAnswerLetter): Question(questionText, totalPoints) {

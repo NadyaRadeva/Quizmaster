@@ -41,14 +41,10 @@ Question* ShortAnswerQuestion::clone() const {
     return new ShortAnswerQuestion(*this);
 }
 
-void ShortAnswerQuestion::saveToFile(const char* filename) const {
-    std::ofstream file(filename);
-
+void ShortAnswerQuestion::saveToFile(std::ofstream& file) const {
     if (!file.is_open()) {
         throw std::invalid_argument("Error opening file for writing!");
     }
 
     file << this->getQuestionText() << ":" << std::endl;
-
-    file.close();
 }

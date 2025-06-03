@@ -28,6 +28,10 @@ public:
     void pushBack(const T& obj);
     void pushBack(T&& obj);
     T popBack();
+    bool contains(const T* element) const;
+    bool contains(const T& element) const;
+    void remove(const T& element);
+	void remove(const T* element);
 
 private:
     T* data;
@@ -217,4 +221,62 @@ inline T MyVector<T>::popBack() {
         throw std::length_error("Vector is already empty!");
     }
     return data[--size];
+}
+
+template<typename T>
+inline bool MyVector<T>::contains(const T* element) const {
+	if (element == nullptr) {
+		throw std::invalid_argument("Element cannot be null!");
+	}
+
+	for (size_t i = 0; i < size; ++i) {
+		if (&data[i] == element) {
+			return true;
+		}
+	}
+	return false;
+}
+
+template<typename T>
+inline bool MyVector<T>::contains(const T& element) const {
+	for (size_t i = 0; i < size; ++i) {
+		if (data[i] == element) {
+			return true;
+		}
+	}
+	return false;
+}
+
+template<typename T>
+inline void MyVector<T>::remove(const T& element) {
+	for (size_t i = 0; i < size; ++i) {
+		if (data[i] == element) {
+			for (size_t j = i; j < size - 1; ++j) {
+				data[j] = data[j + 1];
+			}
+			--size;
+			return;
+		}
+	}
+
+	throw std::invalid_argument("Element not found in vector!");
+}
+
+template<typename T>
+inline void MyVector<T>::remove(const T* element) {
+	if (element == nullptr) {
+		throw std::invalid_argument("Element cannot be null!");
+	}
+
+	for (size_t i = 0; i < size; ++i) {
+		if (&data[i] == element) {
+			for (size_t j = i; j < size - 1; ++j) {
+				data[j] = data[j + 1];
+			}
+			--size;
+			return;
+		}
+	}
+
+	throw std::invalid_argument("Element not found in vector!");
 }

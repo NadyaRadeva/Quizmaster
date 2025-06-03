@@ -46,9 +46,7 @@ Question* MatchingPairsQuestion::clone() const {
     return new MatchingPairsQuestion(*this);
 }
 
-void MatchingPairsQuestion::saveToFile(const char* filename) const {
-    std::ofstream file(filename);
-
+void MatchingPairsQuestion::saveToFile(std::ofstream& file) const {
     if (!file.is_open()) {
         throw std::invalid_argument("Error opening file for writing!");
     }
@@ -75,8 +73,7 @@ void MatchingPairsQuestion::saveToFile(const char* filename) const {
 
         file << std::endl;
     }
-
-    file.close();
+    ;
 }
 
 MatchingPairsQuestion::MatchingPairsQuestion(const MyString& questionText, size_t totalPoints, const MyVector<MyString>& rightColumn, const MyVector<MyString>& leftColumn, const MyString& correctAnswers): Question(questionText, totalPoints) {
