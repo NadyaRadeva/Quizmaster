@@ -38,17 +38,9 @@ Question* TrueOrFalseQuestion::clone() const {
 	return new TrueOrFalseQuestion(*this);
 }
 
-void TrueOrFalseQuestion::saveToFile(const char* filename) const {
-	std::ofstream file(filename);
-
-	if (!file.is_open()) {
-		throw std::invalid_argument("Error opening file for writing!");
-	}
-
+void TrueOrFalseQuestion::saveToFile(std::ofstream& file) const {
 	file << this->getQuestionText() << std::endl;
 	file << "True/False" << std::endl;
-
-	file.close();
 }
 
 TrueOrFalseQuestion::TrueOrFalseQuestion(const MyString& questionText, size_t totalPoints, bool correctAnswer): Question(questionText, totalPoints) {
