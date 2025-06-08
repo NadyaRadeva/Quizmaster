@@ -15,7 +15,7 @@ class User;
 
 class Quiz {
 public:
-	Quiz(const MyString& title, const Player* author, const MyVector<Question*> questions, bool isApproved, const MyVector<const Player*> likedBy, const MyVector<const Player*> favouriteBy);
+	Quiz(const MyString& title, const Player* author, const MyVector<Question*> questions, bool isApproved, const MyVector<const Player*> likedBy, const MyVector<const Player*> favouriteBy, size_t timesAttempted);
 	Quiz();
 
 	void setQuizTitle(const MyString& title);
@@ -24,6 +24,7 @@ public:
 	void setQuizApproved(bool isApproved);
 	void setQuizLikedByList(const MyVector<const Player*> likedBy);
 	void setQuizFavouriteByList(const MyVector<const Player*> favouriteBy);
+	void setTimesAttempted(size_t timesAttempted);
 
 	size_t getQuizId() const;
 	const MyString& getQuizTitle() const;
@@ -32,6 +33,7 @@ public:
 	bool isQuizApproved() const;
 	const MyVector<const Player*> getQuizLikedByList() const;
 	const MyVector<const Player*> getQuizFavouriteByList() const;
+	size_t getTimesAttempted() const;
 
 	void saveToFile(const char* filename) const;
 
@@ -43,6 +45,7 @@ private:
 	bool isApproved;
 	MyVector<const Player*> likedBy;
 	MyVector<const Player*> favouriteBy;
+	size_t timesAttempted;
 
 	void addLike(const Player& player);
 	void addFavourite(const Player& player);
