@@ -73,7 +73,6 @@ void MatchingPairsQuestion::saveToFile(std::ofstream& file) const {
 
         file << std::endl;
     }
-    ;
 }
 
 MatchingPairsQuestion::MatchingPairsQuestion(const MyString& questionText, size_t totalPoints, const MyVector<MyString>& rightColumn, const MyVector<MyString>& leftColumn, const MyString& correctAnswers): Question(questionText, totalPoints) {

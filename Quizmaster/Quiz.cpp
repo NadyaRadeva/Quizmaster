@@ -30,6 +30,28 @@ const MyVector<const Player*> Quiz::getQuizFavouriteByList() const {
 	return this->favouriteBy;
 }
 
+size_t Quiz::getTimesAttempted() const {
+	return this->timesAttempted;
+}
+
+void Quiz::saveToFile(const char* filename) const {
+	std::ofstream file(filename);
+
+	if (!file.is_open()) {
+		throw std::invalid_argument("Failed to open file for writing!");
+	}
+
+	file << this->title << " - <" << this->questions.getVectorSize() << "> Questions" << std::endl;
+	file << "By " << this->author->getUserFirstName() << " " << this->author->getUserLastName() << "  @" << this->author->getUserName() << std::endl;
+
+	for (size_t i = 0; i < this->questions.getVectorSize(); ++i) {
+		file << (i + 1) << ") ";
+		questions[i]->saveToFile(file);
+	}
+
+	file.close();
+}
+
 void Quiz::addLike(const Player& player) {
 	if (this->likedBy.contains(&player)) {
 		throw std::invalid_argument("Player has already liked this quiz!");
@@ -72,7 +94,7 @@ void Quiz::removeFavourite(const Player& player) {
 	}
 }
 
-Quiz::Quiz(const MyString& title, const Player* author, const MyVector<Question*> questions, bool isApproved, const MyVector<const Player*> likedBy, const MyVector<const Player*> favouriteBy) {
+Quiz::Quiz(const MyString& title, const Player* author, const MyVector<Question*> questions, bool isApproved, const MyVector<const Player*> likedBy, const MyVector<const Player*> favouriteBy, size_t timesAttempted) {
 	++this->ID;
     setQuizTitle(title);
     setQuizAuthor(author);
@@ -80,6 +102,7 @@ Quiz::Quiz(const MyString& title, const Player* author, const MyVector<Question*
 	setQuizApproved(isApproved);
 	setQuizLikedByList(likedBy);
 	setQuizFavouriteByList(favouriteBy);
+	setTimesAttempted(timesAttempted);
 }
 
 Quiz::Quiz() {
@@ -125,4 +148,8 @@ void Quiz::setQuizLikedByList(const MyVector<const Player*> likedBy) {
 
 void Quiz::setQuizFavouriteByList(const MyVector<const Player*> favouriteBy) {
 	this->favouriteBy = favouriteBy;
+}
+
+void Quiz::setTimesAttempted(size_t timesAttempted) {
+	this->timesAttempted = timesAttempted;
 }

@@ -128,8 +128,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Administrator.cpp" />
+    <ClCompile Include="Challenges.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatchingPairsQuestion.cpp" />
+    <ClCompile Include="Message.cpp" />
     <ClCompile Include="MultipleChoiceQuestion.cpp" />
     <ClCompile Include="MyString.cpp" />
     <ClCompile Include="MyVector.cpp" />
@@ -144,7 +146,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Administrator.h" />
+    <ClInclude Include="Challenges.h" />
     <ClInclude Include="MatchingPairsQuestion.h" />
+    <ClInclude Include="Message.h" />
     <ClInclude Include="MultipleChoiceQuestion.h" />
     <ClInclude Include="MyString.h" />
     <ClInclude Include="MyVector.hpp" />
