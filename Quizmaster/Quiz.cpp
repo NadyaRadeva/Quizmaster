@@ -18,8 +18,8 @@ const MyVector<Question*> Quiz::getQuestiions() const {
     return this->questions;
 }
 
-bool Quiz::isQuizApproved() const {
-    return this->isApproved;
+QuizStatus Quiz::getQuizStatus() const {
+	return this->status;
 }
 
 const MyVector<const Player*> Quiz::getQuizLikedByList() const {
@@ -34,8 +34,8 @@ size_t Quiz::getTimesAttempted() const {
 	return this->timesAttempted;
 }
 
-void Quiz::saveToFile(const char* filename) const {
-	std::ofstream file(filename);
+void Quiz::saveToFile(const MyString& filename) const {
+	std::ofstream file(filename.toChar());
 
 	if (!file.is_open()) {
 		throw std::invalid_argument("Failed to open file for writing!");
@@ -52,54 +52,142 @@ void Quiz::saveToFile(const char* filename) const {
 	file.close();
 }
 
-void Quiz::addLike(const Player& player) {
-	if (this->likedBy.contains(&player)) {
-		throw std::invalid_argument("Player has already liked this quiz!");
+void Quiz::runNormalMode(Player& player, bool shuffle) {
+	MyVector<Question*> questionsToAsk = questions;
+
+	if (shuffle) {
+		shuffleQuestionsUsingRand(questionsToAsk);
 	}
 
-	this->likedBy.pushBack(&player);
+	double totalScore = 0;
+
+	for (size_t i = 0; i < questionsToAsk.getVectorSize(); ++i) {
+		std::cout << "Question: " << questionsToAsk[i]->getQuestionText() << std::endl;
+		double score = questionsToAsk[i]->answerEvaluation();
+		std::cout << "You scored " << score << " points." << std::endl;
+		totalScore += score;
+	}
+
+	player.addPoints(totalScore);
+	timesAttempted++;
+
+	std::cout << "Quiz finished! Your total score: " << totalScore << std::endl;
+}
+
+void Quiz::runTestMode(Player& player, bool shuffle) {
+	MyVector<Question*> questionsToAsk = questions;
+
+	if (shuffle) {
+		shuffleQuestionsUsingRand(questionsToAsk);
+	}
+
+	std::cout << "Running quiz in TEST MODE." << std::endl;
+
+	for (size_t i = 0; i < questionsToAsk.getVectorSize(); ++i) {
+		std::cout << "Question " << (i + 1) << ": " << questionsToAsk[i]->getQuestionText() << "\n";
+
+		double score = questionsToAsk[i]->answerEvaluation();
+
+		std::cout << "Correct answer: ";
+		questionsToAsk[i]->printCorrectAnswer();
+		std::cout << std::endl;
+	}
+
+	std::cout << "Test mode complete. No points were added."<<std::endl;
+}
+
+
+void Quiz::addLike(const Player& player) {
+	for (size_t i = 0; i < likedBy.getVectorSize(); ++i) {
+		if (likedBy[i] == &player) {
+			return;
+		}
+	}
+	likedBy.pushBack(&player);
 }
 
 void Quiz::addFavourite(const Player& player) {
-	if (this->favouriteBy.contains(&player)) {
-		throw std::invalid_argument("Player has already added this quiz to favourites!");
+	for (size_t i = 0; i < favouriteBy.getVectorSize(); ++i) {
+		if (favouriteBy[i] == &player) {
+			return;
+		}
 	}
-
-	this->favouriteBy.pushBack(&player);
+	favouriteBy.pushBack(&player);
 }
 
 void Quiz::removeLike(const Player& player) {
-	if (!this->likedBy.contains(&player)) {
-		throw std::invalid_argument("Player has not liked this quiz!");
-	}
-
-	for (size_t i = 0; i < this->likedBy.getVectorSize(); ++i) {
-		if (this->likedBy[i] == &player) {
-			this->likedBy.remove(&player);
-			return;
+	for (size_t i = 0; i < likedBy.getVectorSize(); ++i) {
+		if (likedBy[i] == &player) {
+			likedBy.removeAt(i);
+			break;
 		}
 	}
 }
 
 void Quiz::removeFavourite(const Player& player) {
-	if (!this->favouriteBy.contains(&player)) {
-		throw std::invalid_argument("Player has not added this quiz to favourites!");
-	}
-
-	for (size_t i = 0; i < this->favouriteBy.getVectorSize(); ++i) {
-		if (this->favouriteBy[i] == &player) {
-			this->favouriteBy.remove(&player);
-			return;
+	for (size_t i = 0; i < favouriteBy.getVectorSize(); ++i) {
+		if (favouriteBy[i] == &player) {
+			favouriteBy.removeAt(i);
+			break;
 		}
 	}
 }
 
-Quiz::Quiz(const MyString& title, const Player* author, const MyVector<Question*> questions, bool isApproved, const MyVector<const Player*> likedBy, const MyVector<const Player*> favouriteBy, size_t timesAttempted) {
+void Quiz::shuffleQuestionsUsingRand(MyVector<Question*>& quiz) {
+	size_t n = quiz.getVectorSize();
+	for (size_t i = 0; i < n - 1; ++i) {
+		size_t j = i + rand() % (n - i);
+		Question* temp = quiz[i];
+		quiz[i] = quiz[j];
+		quiz[j] = temp;
+	}
+}
+
+void Quiz::copyFrom(const Quiz& other) {
+	this->ID = other.ID;
+	this->title = other.title;
+	this->author = other.author;
+	questions.clear();
+	for (size_t i = 0; i < other.questions.getVectorSize(); ++i) {
+		questions.pushBack(other.questions[i]->clone());
+	}
+	this->status = other.status;
+	this->likedBy = other.likedBy;
+	this->favouriteBy = other.favouriteBy;
+	this->timesAttempted = other.timesAttempted;
+}
+
+void Quiz::freeQuestions() {
+	for (size_t i = 0; i < this->questions.getVectorSize(); ++i) {
+		delete this->questions[i];
+	}
+	this->questions.clear();
+}
+
+void Quiz::freeLikedBy() {
+	this->likedBy.clear();
+}
+
+void Quiz::freeFavouriteBy() {
+	this->favouriteBy.clear();
+}
+
+void Quiz::freeQuiz() {
+	freeQuestions();
+	freeLikedBy();
+	freeFavouriteBy();
+	this->title = MyString();
+	this->author = nullptr;
+	this->status = QuizStatus::PENDING;
+	this->timesAttempted = 0;
+}
+
+Quiz::Quiz(const MyString& title, const Player* author, const MyVector<Question*> questions, QuizStatus status, const MyVector<const Player*> likedBy, const MyVector<const Player*> favouriteBy, size_t timesAttempted) {
 	++this->ID;
     setQuizTitle(title);
     setQuizAuthor(author);
     setQuestions(questions);
-	setQuizApproved(isApproved);
+	setQuizStatus(status);
 	setQuizLikedByList(likedBy);
 	setQuizFavouriteByList(favouriteBy);
 	setTimesAttempted(timesAttempted);
@@ -109,9 +197,28 @@ Quiz::Quiz() {
 	++this->ID;
 	this->title = "Untitled Quiz";
 	this->author = nullptr;
-	this->isApproved = false;
+	this->status = QuizStatus::PENDING;
+	this->questions = MyVector<Question*>();
 	this->likedBy = MyVector<const Player*>();
 	this->favouriteBy = MyVector<const Player*>();
+	this->timesAttempted = 0;
+}
+
+Quiz::Quiz(const Quiz& other) {
+	this->copyFrom(other);
+}
+
+Quiz& Quiz::operator=(const Quiz& other) {
+	if (this != &other) {
+		this->freeQuiz();
+		this->copyFrom(other);
+	}
+
+	return *this;
+}
+
+Quiz::~Quiz() {
+	this->freeQuiz();
 }
 
 void Quiz::setQuizTitle(const MyString& title) {
@@ -138,8 +245,8 @@ void Quiz::setQuestions(const MyVector<Question*> questions) {
 	this->questions = questions;
 }
 
-void Quiz::setQuizApproved(bool isApproved) {
-	this->isApproved = isApproved;
+void Quiz::setQuizStatus(QuizStatus status) {
+	this->status = status;
 }
 
 void Quiz::setQuizLikedByList(const MyVector<const Player*> likedBy) {

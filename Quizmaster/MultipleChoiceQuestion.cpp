@@ -68,6 +68,21 @@ const MyVector<char>& MultipleChoiceQuestion::getCorrectAnswers() const {
     return this->correctAnswers;
 }
 
+void MultipleChoiceQuestion::printCorrectAnswer() const {
+    std::cout << "Correct answer(s):" << std::endl;
+    for (size_t i = 0; i < correctAnswers.getVectorSize(); ++i) {
+        char letter = correctAnswers[i];
+        if (letter >= 'a' && letter <= 'z') {
+            letter += TO_UPPER_CASE_CHANGE;
+        }
+
+        size_t index = letter - 'A';
+        if (index < options.getVectorSize()) {
+            std::cout << letter << ") " << options[index] << std::endl;
+        }
+    }
+}
+
 double MultipleChoiceQuestion::answerEvaluation() {
     std::cout << "Answer the following question (enter letters, comma-separated, e.g., A,C):" << std::endl;
     for (size_t i = 0; i < options.getVectorSize(); ++i) {

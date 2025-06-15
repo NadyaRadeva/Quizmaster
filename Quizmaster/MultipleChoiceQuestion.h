@@ -19,6 +19,7 @@ public:
 	const MyVector<MyString>& getOptions() const;
 	const MyVector<char>& getCorrectAnswers() const;
 
+	void printCorrectAnswer() const override;
 	double answerEvaluation() override;
 	Question* clone() const override;
 	void saveToFile(std::ofstream& file) const override;

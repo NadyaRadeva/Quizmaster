@@ -73,3 +73,12 @@ void User::ban() {
 void User::unban() {
 	this->isBanned = false;
 }
+
+bool User::checkPassword(const MyString& pass) const {
+	return this->password == pass;
+}
+
+std::ostream& operator<<(std::ostream& os, const User& user) {
+	user.print(os);
+	return os;
+}

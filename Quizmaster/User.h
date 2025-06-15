@@ -28,9 +28,11 @@ public:
 	virtual void print(std::ostream& os) const = 0;
 
 	virtual bool isAdmin() const = 0;
+	virtual bool isPlayer() const = 0;
 	bool getIsBanned() const;
 	void ban();
 	void unban();
+	bool checkPassword(const MyString& pass) const;
 
 private:
 	MyString firstName;
