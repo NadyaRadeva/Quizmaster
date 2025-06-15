@@ -8,6 +8,10 @@ bool TrueOrFalseQuestion::getCorrectAnswer() const {
 	return this->correctAnswer;
 }
 
+void TrueOrFalseQuestion::printCorrectAnswer() const {
+	std::cout << "Correct answer: " << (correctAnswer ? "True" : "False") << std::endl;
+}
+
 double TrueOrFalseQuestion::answerEvaluation() {
 	std::cout << "Enter your answer (true/t and and false/f) :";
 	MyString userInput;

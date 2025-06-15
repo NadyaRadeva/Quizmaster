@@ -128,7 +128,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Administrator.cpp" />
-    <ClCompile Include="Challenges.cpp" />
+    <ClCompile Include="ChallengeManager.cpp" />
+    <ClCompile Include="ChallengeProgress.cpp" />
+    <ClCompile Include="ChallengeTemplate.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatchingPairsQuestion.cpp" />
     <ClCompile Include="Message.cpp" />
@@ -138,15 +140,22 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Question.cpp" />
     <ClCompile Include="Quiz.cpp" />
+    <ClCompile Include="QuizManager.cpp" />
+    <ClCompile Include="QuizStatuses.cpp" />
     <ClCompile Include="QuizTypes.cpp" />
+    <ClCompile Include="Report.cpp" />
+    <ClCompile Include="ReportManager.cpp" />
     <ClCompile Include="ShortAnswerQuestion.cpp" />
     <ClCompile Include="SingleChoiceQuestion.cpp" />
     <ClCompile Include="TrueOrFalseQuestion.cpp" />
     <ClCompile Include="User.cpp" />
+    <ClCompile Include="UserManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Administrator.h" />
-    <ClInclude Include="Challenges.h" />
+    <ClInclude Include="ChallengeManager.h" />
+    <ClInclude Include="ChallengeProgress.h" />
+    <ClInclude Include="ChallengeTemplate.h" />
     <ClInclude Include="MatchingPairsQuestion.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="MultipleChoiceQuestion.h" />
@@ -155,11 +164,16 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Question.h" />
     <ClInclude Include="Quiz.h" />
+    <ClInclude Include="QuizManager.h" />
+    <ClInclude Include="QuizStatuses.h" />
     <ClInclude Include="QuizTypes.h" />
+    <ClInclude Include="Report.h" />
+    <ClInclude Include="ReportManager.h" />
     <ClInclude Include="ShortAnswerQuestion.h" />
     <ClInclude Include="SingleChoiceQuestion.h" />
     <ClInclude Include="TrueOrFalseQuestion.h" />
     <ClInclude Include="User.h" />
+    <ClInclude Include="UserManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

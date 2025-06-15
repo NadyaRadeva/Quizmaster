@@ -32,6 +32,7 @@ public:
     bool contains(const T& element) const;
     void remove(const T& element);
 	void remove(const T* element);
+    void removeAt(size_t index);
 
 private:
     T* data;
@@ -44,7 +45,6 @@ private:
     void freeVector();
 };
 
-#endif // !_MYVECTOR_H
 
 template<typename T>
 inline MyVector<T>::MyVector() : data(nullptr), size(0), capacity(0) {}
@@ -225,58 +225,72 @@ inline T MyVector<T>::popBack() {
 
 template<typename T>
 inline bool MyVector<T>::contains(const T* element) const {
-	if (element == nullptr) {
-		throw std::invalid_argument("Element cannot be null!");
-	}
+    if (element == nullptr) {
+        throw std::invalid_argument("Element cannot be null!");
+    }
 
-	for (size_t i = 0; i < size; ++i) {
-		if (&data[i] == element) {
-			return true;
-		}
-	}
-	return false;
+    for (size_t i = 0; i < size; ++i) {
+        if (&data[i] == element) {
+            return true;
+        }
+    }
+    return false;
 }
 
 template<typename T>
 inline bool MyVector<T>::contains(const T& element) const {
-	for (size_t i = 0; i < size; ++i) {
-		if (data[i] == element) {
-			return true;
-		}
-	}
-	return false;
+    for (size_t i = 0; i < size; ++i) {
+        if (data[i] == element) {
+            return true;
+        }
+    }
+    return false;
 }
 
 template<typename T>
 inline void MyVector<T>::remove(const T& element) {
-	for (size_t i = 0; i < size; ++i) {
-		if (data[i] == element) {
-			for (size_t j = i; j < size - 1; ++j) {
-				data[j] = data[j + 1];
-			}
-			--size;
-			return;
-		}
-	}
+    for (size_t i = 0; i < size; ++i) {
+        if (data[i] == element) {
+            for (size_t j = i; j < size - 1; ++j) {
+                data[j] = data[j + 1];
+            }
+            --size;
+            return;
+        }
+    }
 
-	throw std::invalid_argument("Element not found in vector!");
+    throw std::invalid_argument("Element not found in vector!");
 }
 
 template<typename T>
 inline void MyVector<T>::remove(const T* element) {
-	if (element == nullptr) {
-		throw std::invalid_argument("Element cannot be null!");
-	}
+    if (element == nullptr) {
+        throw std::invalid_argument("Element cannot be null!");
+    }
 
-	for (size_t i = 0; i < size; ++i) {
-		if (&data[i] == element) {
-			for (size_t j = i; j < size - 1; ++j) {
-				data[j] = data[j + 1];
-			}
-			--size;
-			return;
-		}
-	}
+    for (size_t i = 0; i < size; ++i) {
+        if (&data[i] == element) {
+            for (size_t j = i; j < size - 1; ++j) {
+                data[j] = data[j + 1];
+            }
+            --size;
+            return;
+        }
+    }
 
-	throw std::invalid_argument("Element not found in vector!");
+    throw std::invalid_argument("Element not found in vector!");
 }
+
+template<typename T>
+inline void MyVector<T>::removeAt(size_t index) {
+	if (index >= size) {
+		throw std::invalid_argument("Index is out of range!");
+	}
+
+	for (size_t i = index; i < size - 1; ++i) {
+		data[i] = data[i + 1];
+	}
+	--size;
+}
+
+#endif // !_MYVECTOR_HPP

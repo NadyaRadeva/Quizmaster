@@ -31,6 +31,7 @@ public:
     const MyString& getOptionD() const;
     char getCorrectAnswerLetter() const;
 
+    void printCorrectAnswer() const override;
     double answerEvaluation() override;
     Question* clone() const override;
     void saveToFile(std::ofstream& file) const override;

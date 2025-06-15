@@ -18,6 +18,7 @@ public:
 	const MyString& getQuestionText() const;
 	size_t getTotalPoints() const;
 
+	virtual void printCorrectAnswer() const = 0;
 	virtual double answerEvaluation() = 0;
 	virtual Question* clone() const = 0;
 	virtual void saveToFile(std::ofstream& file) const = 0;

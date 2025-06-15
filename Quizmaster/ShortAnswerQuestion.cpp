@@ -19,6 +19,10 @@ const MyString& ShortAnswerQuestion::getCorrectShortAnswer() const {
     return this->correctShortAnswer;
 }
 
+void ShortAnswerQuestion::printCorrectAnswer() const {
+	std::cout << "Correct answer: " << this->getCorrectShortAnswer() << std::endl;
+}
+
 double ShortAnswerQuestion::answerEvaluation() {
     MyString userInput;
     char buffer[MAX_LEN_SHORT_ANSWER_BUFFER + 1];

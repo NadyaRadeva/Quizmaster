@@ -1,5 +1,41 @@
 #include "MatchingPairsQuestion.h"
 
+void MatchingPairsQuestion::printCorrectAnswer() const {
+    std::cout << "Correct matching pairs:" << std::endl;
+
+    MyString cleanCorrect = correctAnswers.removeSpaces();
+    size_t correctLen = cleanCorrect.getLength();
+
+    if (correctLen % 2 != 0) {
+        std::cout << "Invalid correct answer format!" << std::endl;
+        return;
+    }
+
+    for (size_t i = 0; i < correctLen; i += 2) {
+        char left = cleanCorrect[i];
+        char right = cleanCorrect[i + 1];
+
+        if (left >= 'a' && left <= 'z') {
+            left -= TO_UPPER_CASE_CHANGE;
+        }
+
+        if (right >= 'A' && right <= 'Z') {
+            right += TO_LOWER_CASE_CHANGE;
+        }
+
+        size_t leftIndex = left - 'A';
+        size_t rightIndex = right - 'a';
+
+        if (leftIndex < leftColumn.getVectorSize() && rightIndex < rightColumn.getVectorSize()) {
+            std::cout << left << " - " << right << ": "
+                << leftColumn[leftIndex] << " - " << rightColumn[rightIndex] << std::endl;
+        }
+        else {
+            std::cout << left << " - " << right << ": Invalid index!" << std::endl;
+        }
+    }
+}
+
 double MatchingPairsQuestion::answerEvaluation() {
     std::cout << "Enter the answers in a format like 'Ab Cd Ef': ";
 

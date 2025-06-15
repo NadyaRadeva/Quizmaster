@@ -6,6 +6,7 @@
 
 const int TO_LOWER_CASE_CHANGE = 'a' - 'A';
 const int TO_UPPER_CASE_CHANGE = 'A' - 'a';
+const int TO_CHAR = '0';
 
 const size_t MAX_BUFFER_SIZE = 10000;
 
@@ -29,6 +30,7 @@ public:
 	void myStrCat(char* first, const char* second);
 	int myStrCmp(const char* str1, const char* str2) const;
 	bool isNumber();
+	static MyString intToString(int num);
 	MyString removeSpaces() const;
 
 	//Case insensitivity
@@ -39,15 +41,22 @@ public:
 	MyString toLower() const;
 	MyString toUpper() const;
 	
-
 	//Operator overloading
 	bool operator==(const MyString& str) const;
 	bool operator!=(const MyString& str) const;
 	MyString& operator+=(char c);
+	friend MyString operator+(const MyString& lhs, const MyString& rhs);
 	friend std::istream& operator>>(std::istream& in, MyString& input);
 	friend std::ostream& operator<<(std::ostream& out, const MyString& output);
 	char& operator[](size_t index);
 	const char& operator[](size_t index) const;
+
+	const char* toChar() const;
+
+	//Number handling
+	static int countDigits(int num);
+	static int reverseNumber(int num);
+	static MyString toStr(int num);
 
 	void print() const;
 

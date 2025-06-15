@@ -14,6 +14,7 @@ public:
 	void setCorrectAnswer(bool correctAnswer);
 	bool getCorrectAnswer() const;
 
+	void printCorrectAnswer() const override;
 	double answerEvaluation() override;
 	Question* clone() const override;
 	void saveToFile(std::ofstream& file) const override;

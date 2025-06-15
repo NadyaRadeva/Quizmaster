@@ -146,6 +146,51 @@ const char& MyString::operator[](size_t index) const {
     return this->str[index];
 }
 
+const char* MyString::toChar() const {
+    return this->str;
+}
+
+int MyString::countDigits(int num) {
+    int count = 0;
+
+    do {
+        count++;
+        num /= 10;
+    } while (num != 0);
+
+    return count;
+}
+
+int MyString::reverseNumber(int num) {
+    int reversed = 0;
+
+    while (num > 0) {
+        reversed = reversed * 10 + (num % 10);
+        num /= 10;
+    }
+    return reversed;
+}
+
+MyString MyString::toStr(int num) {
+    if (num == 0) {
+        return MyString("0");
+    }
+
+    int digits = countDigits(num);
+    int reversedNum = reverseNumber(num);
+
+    char* buffer = new char[digits + 1];
+    for (int i = 0; i < digits; ++i) {
+        buffer[i] = (reversedNum % 10) + TO_CHAR;
+        reversedNum /= 10;
+    }
+    buffer[digits] = '\0';
+
+    MyString result(buffer);
+    delete[] buffer;
+    return result;
+}
+
 void MyString::print() const {
     std::cout << (this->str ? this->str : "[null]") << std::endl;
 }
@@ -228,6 +273,30 @@ bool MyString::isNumber() {
     return true;
 }
 
+MyString MyString::intToString(int num) {
+    if (num == 0) {
+        return MyString("0");
+    }
+
+    char buffer[MAX_BUFFER_SIZE];
+    int i = 0;
+
+    while (num > 0) {
+        buffer[i++] = (num % 10) + '0';
+        num /= 10;
+    }
+
+    for (int j = 0; j < i / 2; j++) {
+        char temp = buffer[j];
+        buffer[j] = buffer[i - j - 1];
+        buffer[i - j - 1] = temp;
+    }
+
+    buffer[i] = '\0';
+
+    return MyString(buffer);
+}
+
 MyString MyString::removeSpaces() const {
     MyString result;
 
@@ -238,6 +307,31 @@ MyString MyString::removeSpaces() const {
     }
 
     return result;
+}
+
+MyString operator+(const MyString& lhs, const MyString& rhs) {
+	if (!lhs.str || !rhs.str) {
+		throw std::invalid_argument("Cannot concatenate null MyString objects!");
+	}
+
+	size_t newLen = lhs.len + rhs.len;
+	char* newStr = new char[newLen + 1];
+
+	for (size_t i = 0; i < lhs.len; ++i) {
+		newStr[i] = lhs.str[i];
+	}
+
+	for (size_t i = 0; i < rhs.len; ++i) {
+		newStr[lhs.len + i] = rhs.str[i];
+	}
+
+	newStr[newLen] = '\0';
+
+	MyString result(newStr, newLen);
+
+	delete[] newStr;
+
+	return result;
 }
 
 std::istream& operator>>(std::istream& in, MyString& input) {

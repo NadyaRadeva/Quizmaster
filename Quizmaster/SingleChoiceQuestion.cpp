@@ -1,5 +1,33 @@
 #include "SingleChoiceQuestion.h"
 
+void SingleChoiceQuestion::printCorrectAnswer() const {
+	char upperCorrect = correctAnswerLetter;
+	if (upperCorrect >= 'a' && upperCorrect <= 'z') {
+		upperCorrect += TO_UPPER_CASE_CHANGE;
+	}
+
+	std::cout << "Correct answer: " << upperCorrect << ") ";
+
+	switch (upperCorrect) {
+	case 'A':
+		std::cout << answers[ANSWER_A_INDEX];
+		break;
+	case 'B':
+		std::cout << answers[ANSWER_B_INDEX];
+		break;
+	case 'C':
+		std::cout << answers[ANSWER_C_INDEX];
+		break;
+	case 'D':
+		std::cout << answers[ANSWER_D_INDEX];
+		break;
+	default:
+		std::cout << "Unknown";
+		break;
+	}
+	std::cout << std::endl;
+}
+
 double SingleChoiceQuestion::answerEvaluation() {
 	std::cout << "Enter your answer: ";
 	char userAnswer;
