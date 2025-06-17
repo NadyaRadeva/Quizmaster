@@ -1,5 +1,7 @@
-#include "Player.h"
-class ReportManager;
+﻿#include "Player.h"
+
+#include "Report.h"
+#include "ReportManager.h"
 
 size_t Player::getPoints() const {
 	return this->points;
@@ -88,6 +90,21 @@ Quiz* Player::addCreatedQuiz() {
 	return newQuiz;
 }
 
+Quiz* Player::addCreatedQuiz(const MyString& title) {
+	Quiz* newQuiz = new Quiz();
+	newQuiz->setQuizTitle(title);
+	newQuiz->setQuizAuthor(this);
+	newQuiz->setQuizStatus(QuizStatus::PENDING);
+
+	createdQuizzes.pushBack(newQuiz);
+
+	if (quizManager) {
+		const_cast<QuizManager*>(quizManager)->addQuiz(newQuiz);
+	}
+
+	return newQuiz;
+}
+
 void Player::addLikedQuiz(size_t quizId) {
 	Quiz* quiz = quizManager->getQuizById(quizId);
 	if (!quiz)
@@ -140,6 +157,145 @@ void Player::removeFavouriteQuiz(size_t quizId) {
 	throw std::invalid_argument("Quiz with the given ID not found in favourite quizzes!");
 }
 
+void Player::saveLikedQuizzesToFile(const char* filename) const {
+	std::ofstream out(filename);
+	if (!out.is_open()) {
+		return;
+	}
+
+	for (size_t i = 0; i < this->likedQuizzes.getVectorSize(); ++i) {
+		if (likedQuizzes[i]) {
+			out << likedQuizzes[i]->getQuizId() << "\n";
+		}
+	}
+
+	out.close();
+}
+
+void Player::loadLikedQuizzesFromFile(const char* filename, QuizManager* quizManager) {
+	std::ifstream in(filename);
+	if (!in.is_open() || !quizManager) {
+		return;
+	}
+
+	size_t id = 0;
+	while (in >> id) {
+		Quiz* quiz = quizManager->getQuizById(id);
+		if (quiz) {
+			likedQuizzes.pushBack(quiz);
+		}
+	}
+
+	in.close();
+}
+
+void Player::saveFavouriteQuizzesToFile(const char* filename) const {
+	std::ofstream out(filename);
+	if (!out.is_open()) {
+		return;
+	}
+
+	for (size_t i = 0; i < this->favouriteQuizzes.getVectorSize(); ++i) {
+		if (favouriteQuizzes[i]) {
+			out << favouriteQuizzes[i]->getQuizId() << '\n';
+		}
+	}
+
+	out.close();
+}
+
+void Player::loadFavouriteQuizzesFromFile(const char* filename, QuizManager* quizManager) {
+	std::ifstream in(filename);
+	if (!in.is_open() || quizManager == nullptr) {
+		return;
+	}
+
+	favouriteQuizzes.clear();
+
+	size_t id;
+	while (in >> id) {
+		Quiz* quiz = quizManager->getQuizById(id);
+		if (quiz != nullptr) {
+			favouriteQuizzes.pushBack(quiz);
+		}
+	}
+
+	in.close();
+}
+
+void Player::saveCreatedQuizzesToFile(const char* filename) const {
+	std::ofstream out(filename);
+	if (!out.is_open()) return;
+
+	for (size_t i = 0; i < this->createdQuizzes.getVectorSize(); ++i) {
+		if (createdQuizzes[i] != nullptr) {
+			out << createdQuizzes[i]->getQuizId() << '\n';
+		}
+	}
+
+	out.close();
+}
+
+void Player::loadCreatedQuizzesFromFile(const char* filename, QuizManager* quizManager) {
+	std::ifstream in(filename);
+	if (!in.is_open() || quizManager == nullptr) {
+		return;
+	}
+
+	createdQuizzes.clear();
+
+	size_t id;
+	while (in >> id) {
+		Quiz* quiz = quizManager->getQuizById(id);
+		if (quiz != nullptr) {
+			createdQuizzes.pushBack(quiz);
+		}
+	}
+
+	in.close();
+}
+
+void Player::saveMessagesToFile(const char* filename) const {
+	std::ofstream out(filename);
+	if (!out.is_open()) return;
+
+	for (size_t i = 0; i < this->messages.getVectorSize(); ++i) {
+		out << messages[i].getContent() << '\n';
+	}
+
+	out.close();
+}
+
+void Player::loadMessagesFromFile(const char* filename) {
+	std::ifstream in(filename);
+	if (!in.is_open()) {
+		return;
+	}
+
+	messages.clear();
+
+	char ch;
+	MyString currentLine;
+
+	while (in.get(ch)) {
+		if (ch == '\n') {
+			if (!currentLine.isEmpty()) {
+				messages.pushBack(Message(currentLine, nullptr, nullptr));
+				currentLine.clear();
+			}
+		}
+		else {
+			currentLine += ch;
+		}
+	}
+
+	if (!currentLine.isEmpty()) {
+		messages.pushBack(Message(currentLine, nullptr, nullptr));
+	}
+
+	in.close();
+}
+
 void Player::updateChallengeProgress(const ChallengeTemplate& templateData, size_t increment) {
 	for (size_t i = 0; i < challenges.getVectorSize(); ++i) {
 		if (challenges[i].getTemplateId() == templateData.getId()) {
@@ -185,7 +341,9 @@ void Player::viewUnfinishedChallenges(const ChallengeManager& templateManager) c
 	bool hasAny = false;
 	for (size_t i = 0; i < challenges.getVectorSize(); ++i) {
 		const ChallengeProgress& progress = challenges[i];
-		if (progress.getIsCompleted()) continue;
+		if (progress.getIsCompleted()) {
+			continue;
+		}
 
 		const ChallengeTemplate* tmpl = templateManager.getById(progress.getTemplateId());
 		if (!tmpl) continue;
@@ -194,11 +352,11 @@ void Player::viewUnfinishedChallenges(const ChallengeManager& templateManager) c
 		std::cout << "Challenge: " << tmpl->getTitle() << std::endl;
 		std::cout << "Type: " << static_cast<int>(tmpl->getType()) << std::endl;
 		std::cout << "Progress: " << progress.getProgress() << " / " << tmpl->getQuizzesGoal() << std::endl;
-		std::cout << "--------------------------\n";
+		std::cout << "--------------------------" << std::endl;
 	}
 
 	if (!hasAny) {
-		std::cout << "No unfinished challenges.\n";
+		std::cout << "No unfinished challenges." << std::endl;
 	}
 }
 
@@ -223,7 +381,7 @@ void Player::viewFinishedChallenges(const ChallengeManager& templateManager) con
 		time_t completionTime = progress.getTimeCompleted();
 		std::cout << "Completed on: " << std::ctime(&completionTime);
 
-		std::cout << "--------------------------\n";
+		std::cout << "--------------------------" << std::endl;
 	}
 
 	if (!hasAny)
@@ -435,24 +593,176 @@ bool Player::isPlayer() const {
 	return true;
 }
 
+void Player::save() const {
+	MyString filename = "player_" + this->getUserName() + ".txt";
+	std::ofstream out(filename.toChar());
+
+	if (!out.is_open()) {
+		std::cerr << "Error opening file for saving player " << this->getUserName() << "!" << std::endl;
+		return;
+	}
+
+	out << this->getUserName() << std::endl;
+	out << this->getUserPassword() << std::endl;
+	out << this->getUserFirstName() << std::endl;
+	out << this->getUserLastName() << std::endl;
+	out << this->getPoints() << std::endl;
+	out << this->getLevel() << std::endl;
+
+	out << "CreatedQuizIds: " << this->createdQuizzes.getVectorSize() << std::endl;
+	for (size_t i = 0; i < this->createdQuizzes.getVectorSize(); ++i) {
+		out << createdQuizzes[i]->getQuizId() << std::endl;
+	}
+
+	out << "LikedQuizIds: " << this->likedQuizzes.getVectorSize() << std::endl;
+	for (size_t i = 0; i < this->likedQuizzes.getVectorSize(); ++i) {
+		out << likedQuizzes[i]->getQuizId() << std::endl;
+	}
+
+	out << "FavouriteQuizIds: " << this->favouriteQuizzes.getVectorSize() << std::endl;
+	for (size_t i = 0; i < this->favouriteQuizzes.getVectorSize(); ++i) {
+		out << favouriteQuizzes[i]->getQuizId() << std::endl;
+	}
+
+	size_t unfinishedCount = 0;
+	for (size_t i = 0; i < this->challenges.getVectorSize(); ++i) {
+		if (!this->challenges[i].getIsCompleted()) {
+			++unfinishedCount;
+		}
+	}
+
+	out << "UnfinishedChallenges: " << unfinishedCount << std::endl;
+	for (size_t i = 0; i < this->challenges.getVectorSize(); ++i) {
+		if (!this->challenges[i].getIsCompleted()) {
+			this->challenges[i].print(out);
+
+		}
+	}
+
+	size_t finishedCount = 0;
+	for (size_t i = 0; i < this->challenges.getVectorSize(); ++i) {
+		if (this->challenges[i].getIsCompleted()) {
+			++finishedCount;
+		}
+	}
+
+	out << "FinishedChallenges: " << finishedCount << std::endl;
+	for (size_t i = 0; i < this->challenges.getVectorSize(); ++i)
+		if (challenges[i].getIsCompleted()) {
+			challenges[i].print(out);
+		}
+
+	const MyVector<Message>& messages = getMessages();
+	out << messages.getVectorSize() << std::endl;
+	for (size_t i = 0; i < messages.getVectorSize(); i++) {
+		out << messages[i].getContent();
+	}
+
+	out.close();
+}
+
+void Player::load(std::ifstream& in, QuizManager& quizManager) {
+	if (!in.is_open()) {
+		throw std::invalid_argument("Cannot open file!");
+	}
+
+	MyString username = MyString().readLine(in);
+	this->setUserName(username);
+
+	MyString password = MyString().readLine(in);
+	this->setUserPassword(password);
+
+	MyString firstName = MyString().readLine(in);
+	this->setUserFirstName(firstName);
+
+	MyString lastName = MyString().readLine(in);
+	this->setUserLastName(lastName);
+
+	int points = 0;
+	in >> points;
+	this->setPoints(points);
+
+	int level = 0;
+	in >> level;
+	this->setLevel(level);
+
+	in.ignore(1000000, '\n');
+
+	int createdCount = 0;
+	in >> createdCount;
+	in.ignore(1000000, '\n');
+	this->createdQuizzes.clear();
+	for (int i = 0; i < createdCount; ++i) {
+		int quizId;
+		in >> quizId;
+		in.ignore(1000000, '\n');
+
+		Quiz* quizPtr = quizManager.getQuizById(quizId);
+		if (quizPtr != nullptr) {
+			this->createdQuizzes.pushBack(quizPtr);
+		}
+	}
+
+	int likedCount = 0;
+	in >> likedCount;
+	in.ignore(1000000, '\n');
+	this->likedQuizzes.clear();
+	for (int i = 0; i < likedCount; ++i) {
+		int quizId;
+		in >> quizId;
+		in.ignore(1000000, '\n');
+
+		Quiz* quizPtr = quizManager.getQuizById(quizId);
+		if (quizPtr != nullptr) {
+			this->likedQuizzes.pushBack(quizPtr);
+		}
+	}
+
+	int favouriteCount = 0;
+	in >> favouriteCount;
+	in.ignore(1000000, '\n');
+	this->favouriteQuizzes.clear();
+	for (int i = 0; i < favouriteCount; ++i) {
+		int quizId;
+		in >> quizId;
+		in.ignore(1000000, '\n');
+
+		Quiz* quizPtr = quizManager.getQuizById(quizId);
+		if (quizPtr != nullptr) {
+			this->favouriteQuizzes.pushBack(quizPtr);
+		}
+	}
+
+	size_t challengesCount = 0;
+	in >> challengesCount;
+	in.ignore(1000000, '\n');
+	this->challenges.clear();
+	for (size_t i = 0; i < challengesCount; ++i) {
+		ChallengeProgress cp;
+		cp.load(in);
+		this->challenges.pushBack(cp);
+	}
+}
+
+
 Question* Player::createTFQuestion() {
 	std::cout << "Enter the question text:" << std::endl;
 	char questionTextBufferTF[MAX_BUFFER_SIZE];
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	std::cin.getline(questionTextBufferTF, MAX_BUFFER_SIZE);
 	MyString questionText(questionTextBufferTF);
 
 	std::cout << "Enter total points for this question: " << std::endl;
 	size_t totalPoints;
 	std::cin >> totalPoints;
-	std::cin.ignore();
+	std::cin.ignore(10000, '\n');
 
 	std::cout << "Enter the correct answer (true/false):" << std::endl;
 	char correctAnswerBufferTF[MAX_BUFFER_SIZE];
 	std::cin.getline(correctAnswerBufferTF, MAX_BUFFER_SIZE);
 	MyString correctAnswerStr(correctAnswerBufferTF);
 
-	bool correctAnswerBool;
-
+	bool correctAnswerBool = false;
 	if (correctAnswerStr == "true" || correctAnswerStr == "True" || correctAnswerStr == "TRUE") {
 		correctAnswerBool = true;
 	}
@@ -461,12 +771,9 @@ Question* Player::createTFQuestion() {
 	}
 	else {
 		std::cout << "Invalid input for correct answer, defaulting to false." << std::endl;
-		correctAnswerBool = false;
 	}
 
-	TrueOrFalseQuestion* question = new TrueOrFalseQuestion(questionText, totalPoints, correctAnswerBool);
-
-	return question;
+	return new TrueOrFalseQuestion(questionText, totalPoints, correctAnswerBool);
 }
 
 Question* Player::createSCQuestion() {
@@ -668,23 +975,9 @@ void Player::copyFrom(const Player& other) {
 	this->points = other.points;
 	this->level = other.level;
 
-	for (size_t i = 0; i < other.createdQuizzes.getVectorSize(); ++i) {
-		if (other.createdQuizzes[i]) {
-			this->createdQuizzes.pushBack(new Quiz(*other.createdQuizzes[i]));
-		}
-	}
-
-	for (size_t i = 0; i < other.likedQuizzes.getVectorSize(); ++i) {
-		if (other.likedQuizzes[i]) {
-			this->likedQuizzes.pushBack(new Quiz(*other.likedQuizzes[i]));
-		}
-	}
-
-	for (size_t i = 0; i < other.favouriteQuizzes.getVectorSize(); ++i) {
-		if (other.favouriteQuizzes[i]) {
-			this->favouriteQuizzes.pushBack(new Quiz(*other.favouriteQuizzes[i]));
-		}
-	}
+	this->createdQuizzes = other.createdQuizzes;
+	this->likedQuizzes = other.likedQuizzes;
+	this->favouriteQuizzes = other.favouriteQuizzes;
 
 	this->challenges = other.challenges;
 	this->messages = other.messages;
@@ -692,26 +985,14 @@ void Player::copyFrom(const Player& other) {
 }
 
 void Player::freeCreatedQuizzes() {
-	for (size_t i = 0; i < this->createdQuizzes.getVectorSize(); ++i) {
-		delete this->createdQuizzes[i];
-	}
-
 	this->createdQuizzes.clear();
 }
 
 void Player::freeLikedQuizzes() {
-	for (size_t i = 0; i < this->likedQuizzes.getVectorSize(); ++i) {
-		delete this->likedQuizzes[i];
-	}
-
 	this->likedQuizzes.clear();
 }
 
 void Player::freeFavouriteQuizzes() {
-	for (size_t i = 0; i < this->favouriteQuizzes.getVectorSize(); ++i) {
-		delete this->favouriteQuizzes[i];
-	}
-
 	this->favouriteQuizzes.clear();
 }
 

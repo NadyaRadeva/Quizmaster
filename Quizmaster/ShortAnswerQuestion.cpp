@@ -1,4 +1,5 @@
 #include "ShortAnswerQuestion.h"
+#include "QuestionTypes.h"
 
 ShortAnswerQuestion::ShortAnswerQuestion(const MyString& questionText, size_t totalPoints, const MyString& correctShortAnswer): Question(questionText, totalPoints) {
     setCorrectShortAnswer(correctShortAnswer);
@@ -20,7 +21,7 @@ const MyString& ShortAnswerQuestion::getCorrectShortAnswer() const {
 }
 
 void ShortAnswerQuestion::printCorrectAnswer() const {
-	std::cout << "Correct answer: " << this->getCorrectShortAnswer() << std::endl;
+	std::cout << "Correct answer: " << this->getCorrectShortAnswer() << '\n';
 }
 
 double ShortAnswerQuestion::answerEvaluation() {
@@ -50,5 +51,22 @@ void ShortAnswerQuestion::saveToFile(std::ofstream& file) const {
         throw std::invalid_argument("Error opening file for writing!");
     }
 
-    file << this->getQuestionText() << ":" << std::endl;
+    file << static_cast<int>(QuestionTypes::SHORT_ANSWER) << '\n';
+    file << this->getQuestionText() << '\n';
+    file << this->getTotalPoints() << '\n';
+    file << this->correctShortAnswer << '\n';
+}
+
+void ShortAnswerQuestion::loadFromFile(std::ifstream& file) {
+    if (!file.is_open()) {
+        throw std::invalid_argument("Error opening file for reading!");
+    }
+
+    MyString questionText = MyString().readLine(file);
+    MyString totalPointsStr = MyString().readLine(file);
+    MyString correctAnswer = MyString().readLine(file);
+
+    this->setQuestionText(questionText);
+    this->setTotalPoints(totalPointsStr.toInt());
+    this->setCorrectShortAnswer(correctAnswer);
 }

@@ -3,17 +3,6 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-class Quiz;
-class Report;
-class ReportManager;
-class QuizManager;
-class Question;
-class ChallengeProgress;
-class ChallengeTemplate;
-class ChallengeManager;
-class Message;
-class UserManager;
-
 #include "User.h"
 #include "MyString.h"
 #include "MyVector.hpp"
@@ -30,9 +19,21 @@ class UserManager;
 #include "SingleChoiceQuestion.h"
 #include "MultipleChoiceQuestion.h"
 #include "MatchingPairsQuestion.h"
+
+class Quiz;
+class QuizManager;
+class ChallengeProgress;
+class ChallengeTemplate;
+class ChallengeManager;
+class Message;
+class UserManager;
+class ReportManager;
+
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <fstream>
+
 
 const size_t MAX_LEVEL = 100;
 const size_t MILESTONE1 = 10;
@@ -76,17 +77,27 @@ public:
 
     // Quiz Management
     Quiz* addCreatedQuiz();
+    Quiz* addCreatedQuiz(const MyString& title);
     void addLikedQuiz(size_t quizId);
     void removeLikedQuiz(size_t quizId);
     void addFavouriteQuiz(size_t quizId);
     void removeFavouriteQuiz(size_t quizId);
+    
+    void saveLikedQuizzesToFile(const char* filename) const;
+    void loadLikedQuizzesFromFile(const char* filename, QuizManager* quizManager);
+    void saveFavouriteQuizzesToFile(const char* filename) const;
+    void loadFavouriteQuizzesFromFile(const char* filename, QuizManager* quizManager);
+    void saveCreatedQuizzesToFile(const char* filename) const;
+    void loadCreatedQuizzesFromFile(const char* filename, QuizManager* quizManager);
+    void saveMessagesToFile(const char* filename) const;
+    void loadMessagesFromFile(const char* filename);
+
 
     // Challenge Management
     void updateChallengeProgress(const ChallengeTemplate& templateData, size_t increment = 1);
     void viewChallenges(const ChallengeManager& templateManager) const;
     void viewUnfinishedChallenges(const ChallengeManager& templateManager) const;
     void viewFinishedChallenges(const ChallengeManager& templateManager) const;
-
 
 	void viewUser(const MyString& userName, const UserManager& userManager) const;
     void reportQuiz(size_t quizId, const MyString& reason, ReportManager& reportManager);
@@ -105,6 +116,9 @@ public:
     void print(std::ostream& os) const override;
     bool isAdmin() const override;
     bool isPlayer() const override;
+
+    void save() const;
+    void load(std::ifstream& in, QuizManager& quizManager);
 
 private:
     size_t points;

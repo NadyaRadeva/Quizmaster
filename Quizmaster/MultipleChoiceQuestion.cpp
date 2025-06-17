@@ -1,4 +1,5 @@
 #include "MultipleChoiceQuestion.h"
+#include "QuestionTypes.h"
 
 MultipleChoiceQuestion::MultipleChoiceQuestion(const MyString& questionText, size_t totalPoints, const MyVector<MyString>& options, const MyVector<char>& correctAnswers): Question(questionText, totalPoints) {
     setOptions(options);
@@ -153,8 +154,70 @@ void MultipleChoiceQuestion::saveToFile(std::ofstream& file) const {
         throw std::invalid_argument("Error opening file for writing!");
     }
 
-    file << this->getQuestionText() << "?" << std::endl;
-    for (size_t i = 0; i < this->options.getVectorSize() - 1; ++i) {
-        file << char((int)'A' + i) << ") " << this->options[i] << std::endl;
+    file << static_cast<int>(QuestionTypes::MULTIPLE_CHOICE) << std::endl;
+    file << this->getQuestionText() << std::endl;
+    file << this->getTotalPoints() << std::endl;
+
+    file << this->options.getVectorSize() << std::endl;
+    for (size_t i = 0; i < this->options.getVectorSize(); ++i) {
+        file << this->options[i] << std::endl;
+    }
+
+    file << this->correctAnswers.getVectorSize() << std::endl;
+    for (size_t i = 0; i < correctAnswers.getVectorSize(); ++i) {
+        file << correctAnswers[i] << std::endl;
+    }
+}
+
+void MultipleChoiceQuestion::loadFromFile(std::ifstream& file) {
+    if (!file.is_open()) {
+        throw std::invalid_argument("Error opening file for reading!");
+    }
+
+    MyString questionText;
+    readLineFromFile(file, questionText);
+    this->setQuestionText(questionText);
+
+    int points = 0;
+    file >> points;
+    this->setTotalPoints(points);
+
+    size_t optionsCount = 0;
+    file >> optionsCount;
+
+    file.get();
+
+    MyVector<MyString> options;
+    for (size_t i = 0; i < optionsCount; ++i) {
+        MyString option;
+        readLineFromFile(file, option);
+        options.pushBack(option);
+    }
+    this->setOptions(options);
+
+    MyString correctAnsLine;
+    readLineFromFile(file, correctAnsLine);
+
+    MyVector<char> correctAnsVec;
+    for (size_t i = 0; i < correctAnsLine.getLength(); ++i) {
+        char c = correctAnsLine[i];
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+            if (c >= 'A' && c <= 'Z') {
+                c += TO_LOWER_CASE_CHANGE;
+            }
+            correctAnsVec.pushBack(c);
+        }
+    }
+    this->setCorrectAnswers(correctAnsVec);
+}
+
+void MultipleChoiceQuestion::readLineFromFile(std::ifstream& file, MyString& line) {
+    line.clear();
+    char ch;
+    while (file.get(ch)) {
+        if (ch == '\n') {
+            break;
+        }
+        line.pushBack(ch);
     }
 }

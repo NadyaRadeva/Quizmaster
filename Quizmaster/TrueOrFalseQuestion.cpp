@@ -1,4 +1,5 @@
 #include "TrueOrFalseQuestion.h"
+#include "QuestionTypes.h"
 
 void TrueOrFalseQuestion::setCorrectAnswer(bool correctAnswer) {
 	this->correctAnswer = correctAnswer;
@@ -42,9 +43,36 @@ Question* TrueOrFalseQuestion::clone() const {
 	return new TrueOrFalseQuestion(*this);
 }
 
-void TrueOrFalseQuestion::saveToFile(std::ofstream& file) const {
-	file << this->getQuestionText() << std::endl;
-	file << "True/False" << std::endl;
+void TrueOrFalseQuestion::saveToFile(std::ofstream& fout) const {
+	int questionType = static_cast<int>(QuestionTypes::TRUE_OR_FALSE);
+	fout << questionType << "\n";
+	fout << getQuestionText() << "\n";
+	fout << getTotalPoints() << "\n";
+	fout << (correctAnswer ? "true" : "false") << "\n";
+}
+
+void TrueOrFalseQuestion::loadFromFile(std::ifstream& file) {
+	if (!file.is_open()) {
+		throw std::invalid_argument("Error opening file for reading!");
+	}
+
+	MyString questionText = MyString().readLine(file);
+	MyString totalPointsStr = MyString().readLine(file);
+	MyString correctAnswerStr = MyString().readLine(file);
+
+	this->setQuestionText(questionText);
+	this->setTotalPoints(totalPointsStr.toInt());
+
+	correctAnswerStr = correctAnswerStr.toLower();
+	if (correctAnswerStr == "true") {
+		this->correctAnswer = true;
+	}
+	else if (correctAnswerStr == "false") {
+		this->correctAnswer = false;
+	}
+	else {
+		throw std::invalid_argument("Invalid boolean value in file.");
+	}
 }
 
 TrueOrFalseQuestion::TrueOrFalseQuestion(const MyString& questionText, size_t totalPoints, bool correctAnswer): Question(questionText, totalPoints) {

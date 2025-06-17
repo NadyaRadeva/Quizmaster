@@ -47,3 +47,31 @@ User* Message::getSender() const {
 User* Message::getReceiver() const {
 	return this->receiver;
 }
+
+void Message::save(std::ofstream& out) const {
+	out << content << std::endl;
+
+	if (sender) {
+		out << sender->getUserName() << std::endl;
+	}
+	else {
+		out << "NULL" << std::endl;
+	}
+
+	if (receiver) {
+		out << receiver->getUserName() << std::endl;
+	}
+	else {
+		out << "NULL" << std::endl;
+	}
+}
+
+void Message::load(std::ifstream& in) {
+	MyString senderUsername, receiverUsername;
+	content.readLine(in);
+	senderUsername.readLine(in);
+	receiverUsername.readLine(in);
+
+	sender = nullptr;
+	receiver = nullptr;
+}

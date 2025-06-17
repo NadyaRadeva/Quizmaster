@@ -1,5 +1,8 @@
 #include "UserManager.h"
 
+#include "Player.h"
+#include "Administrator.h"
+
 UserManager::UserManager(const MyVector<User*>& allUsers, User* currentUser) {
 	setAllUsers(allUsers);
 	setCurrentUser(currentUser);
@@ -52,7 +55,6 @@ void UserManager::setCurrentUser(User* currentUser) {
 	this->currentUser = currentUser;
 }
 
-
 const MyVector<User*>& UserManager::getAllUsers() const {
 	return this->allUsers;
 }
@@ -72,7 +74,14 @@ bool UserManager::signupPlayer(const MyString& firstName, const MyString& lastNa
 		throw std::invalid_argument("All fields must be filled!");
 	}
 
-	allUsers.pushBack(new Player(firstName, lastName, username, password));
+	Player* newPlayer = new Player(firstName, lastName, username, password);
+	allUsers.pushBack(newPlayer);
+
+	std::ofstream outFile("Users.txt", std::ios::app);
+	if (outFile.is_open()) {
+		outFile << "Player " << firstName << " " << lastName << " " << username << " " << password << " " << newPlayer->getPoints() << " " << newPlayer->getLevel() << std::endl;
+		outFile.close();
+	}
 
 	return true;
 }
@@ -114,20 +123,79 @@ void UserManager::banUser(const MyString& username) {
 	std::cout << "User " << username << " not found!" << std::endl;
 }
 
+void UserManager::addAdministrator(Administrator* admin) {
+	if (!admin) {
+		return;
+	}
+
+	allUsers.pushBack(admin->clone());
+}
+
 void UserManager::quit() {
 	std::cout << "Exiting the application. Goodbye!" << std::endl;
 	this->freeUsers();
 	this->currentUser = nullptr;
 }
 
-const User* UserManager::findPlayerByUserName(const MyString& userName) const {
+Player* UserManager::findPlayerByUserName(const MyString& userName) const {
 	for (size_t i = 0; i < this->allUsers.getVectorSize(); ++i) {
 		if (this->allUsers[i]->getUserName() == userName) {
-			return this->allUsers[i];
+			Player* p = dynamic_cast<Player*>(allUsers[i]);
+			if (p) {
+				return p;
+			}
 		}
 	}
-
 	return nullptr;
+}
+
+void UserManager::saveAllUsersToFile(const char* filename) const {
+	std::ofstream out(filename);
+	if (!out.is_open()) return;
+
+	out << this->allUsers.getVectorSize() << std::endl;
+
+	for (size_t i = 0; i < this->allUsers.getVectorSize(); i++) {
+		User* user = this->allUsers[i];
+		if (Player* p = dynamic_cast<Player*>(user)) {
+			out << static_cast<int>(UsersTypes::PLAYER) << std::endl;
+			p->save();
+		}
+		else if (Administrator* a = dynamic_cast<Administrator*>(user)) {
+			out << static_cast<int>(UsersTypes::ADMINISTRATOR) << std::endl;
+			a->save(out);
+		}
+	}
+	out.close();
+}
+
+void UserManager::loadAllUsersFromFile(const char* filename, QuizManager* quizManager, ReportManager* reportManager) {
+	std::ifstream in(filename);
+	if (!in.is_open()) return;
+
+	size_t userCount = 0;
+	in >> userCount;
+	in.ignore();
+
+	for (size_t i = 0; i < userCount; i++) {
+		int userTypeInt = 0;
+		in >> userTypeInt;
+		in.ignore();
+
+		UsersTypes userType = static_cast<UsersTypes>(userTypeInt);
+
+		if (userType == UsersTypes::PLAYER) {
+			Player* p = new Player();
+			p->load(in, *quizManager);
+			this->allUsers.pushBack(p);
+		}
+		else if (userType == UsersTypes::ADMINISTRATOR) {
+			Administrator* a = new Administrator();
+			a->load(in, reportManager);
+			this->allUsers.pushBack(a);
+		}
+	}
+	in.close();
 }
 
 void UserManager::copyFrom(const UserManager& other) {

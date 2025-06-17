@@ -20,6 +20,9 @@ public:
     User* getSender() const;
     User* getReceiver() const;
 
+    void save(std::ofstream& out) const;
+    void load(std::ifstream& in);
+
 private:
     MyString content;
     User* sender = nullptr;

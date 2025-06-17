@@ -80,6 +80,10 @@ char MyString::toUpperCaseChar(char ch) const {
 }
 
 MyString MyString::toLower() const {
+    if (!str) {
+        return MyString();
+    }
+
     MyString result;
     result.len = this->len;
     result.str = new char[len + 1];
@@ -91,6 +95,10 @@ MyString MyString::toLower() const {
 }
 
 MyString MyString::toUpper() const {
+    if (!str) {
+        return MyString();
+    }
+
     MyString result;
     result.len = this->len;
     result.str = new char[len + 1];
@@ -102,9 +110,14 @@ MyString MyString::toUpper() const {
 }
 
 bool MyString::operator==(const MyString& other) const {
+    if (!str && !other.str) {
+        return true;
+    }
+
     if (!str || !other.str) {
         return false;
     }
+
     return myStrCmp(str, other.str) == 0;
 }
 
@@ -148,6 +161,92 @@ const char& MyString::operator[](size_t index) const {
 
 const char* MyString::toChar() const {
     return this->str;
+}
+
+void MyString::myAppend(char c) {
+    char* newData = new char[this->len + 2];
+
+    for (size_t i = 0; i < this->len; ++i)
+        newData[i] = this->str[i];
+
+    newData[this->len] = c;
+    newData[this->len + 1] = '\0';
+
+    delete[] this->str;
+    this->str = newData;
+    this->len++;
+}
+
+MyString MyString::readLine(std::istream& in) {
+    MyString line;
+    char ch;
+
+    while (true) {
+        if (!in.get(ch)) {
+            break;
+        }
+        if (ch == '\n') {
+            break;
+        }
+        line.myAppend(ch);
+    }
+
+    return line;
+}
+
+int MyString::toInt() const {
+    if (!this->str) {
+        return 0;
+    }
+
+    int result = 0;
+    size_t i = 0;
+    bool negative = false;
+
+    if (this->str[0] == '-') {
+        negative = true;
+        i = 1;
+    }
+
+    for (; i < this->len; ++i) {
+        char c = this->str[i];
+
+        if (c < '0' || c > '9') {
+            throw std::invalid_argument("toInt: invalid character");
+        }
+
+        result = result * 10 + (c - '0');
+    }
+
+    return negative ? -result : result;
+}
+
+bool MyString::isEmpty() const {
+    return this->len == 0;
+}
+
+void MyString::clear() {
+	if (this->str) {
+		delete[] this->str;
+		this->str = nullptr;
+	}
+	this->len = 0;
+}
+
+void MyString::pushBack(char c) {
+    char* newData = new char[this->len + 2];
+
+    for (size_t i = 0; i < this->len; ++i) {
+        newData[i] = this->str[i];
+    }
+
+    newData[this->len] = c;
+    newData[this->len + 1] = '\0';
+
+    delete[] this->str;
+
+    this->str = newData;
+    ++this->len;
 }
 
 int MyString::countDigits(int num) {
@@ -260,7 +359,7 @@ void MyString::free() {
 }
 
 bool MyString::isDigit(char ch) {
-    return ch >= '0' && ch < '9';
+    return ch >= '0' && ch <= '9';
 }
 
 bool MyString::isNumber() {
@@ -305,6 +404,28 @@ MyString MyString::removeSpaces() const {
             result += (*this)[i];
         }
     }
+
+    return result;
+}
+
+MyString MyString::subStr(size_t start, size_t length) const {
+    if (start >= this->len) {
+        return MyString();
+    }
+
+    if (start + length > this->len) {
+        length = this->len - start;
+    }
+
+    char* buffer = new char[length + 1];
+
+    for (size_t i = 0; i < length; ++i) {
+        buffer[i] = this->str[start + i];
+    }
+    buffer[length] = '\0';
+
+    MyString result(buffer);
+    delete[] buffer;
 
     return result;
 }
