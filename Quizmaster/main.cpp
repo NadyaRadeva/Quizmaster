@@ -72,6 +72,8 @@ int main() {
     Administrator* defaultAdmin = new Administrator(MyString("admin"), MyString("admin"), MyString("admin"), MyString("admin"), &quizManager, &reportManager);
     userManager.addAdministrator(defaultAdmin);
 
+    userManager.loadAllUsersFromFile("Users.txt", &quizManager, &reportManager);
+
     bool running = true;
     while (running) {
         showMainMenu();
@@ -143,11 +145,16 @@ int main() {
                             case 2: {
                                 std::cout << "Enter quiz title: ";
                                 char quizTitleBuffer[MAX_STR_BUFFER_SIZE + 1];
+                                std::cin.ignore();
                                 std::cin.getline(quizTitleBuffer, MAX_BUFFER_SIZE);
                                 MyString quizTitle(quizTitleBuffer);
 
-                                Quiz* q = p->addCreatedQuiz(quizTitle);
-                                break;
+                                try {
+                                    p->addCreatedQuiz(quizTitle);
+                                }
+                                catch (const std::exception& e) {
+                                    std::cout << "Quiz creation failed: " << e.what() << "\n";
+                                }
                             }
                             case 3: {
                                 size_t id;

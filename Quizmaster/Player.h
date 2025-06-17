@@ -44,6 +44,7 @@ const size_t REQUIRED_POINTS_LEVEL_TO_LEVEL_MILESTONE1 = 1000;
 const size_t REQUIRED_POINTS_LEVEL_TO_LEVEL_MILESTONE2 = 2000;
 const size_t REQUIRED_POINTS_LEVEL_TO_LEVEL_MILESTONE3 = 3000;
 const size_t REQUIRED_POINTS_LEVEL_TO_LEVEL_MILESTONE4 = 4000;
+const size_t MAX_BUFFER_SIZE_QUESTION_TYPE = 10;
 
 class Player : public User {
 public:
@@ -76,6 +77,7 @@ public:
 	const QuizManager* getQuizManager() const;
 
     // Quiz Management
+	void createQuiz();
     Quiz* addCreatedQuiz();
     Quiz* addCreatedQuiz(const MyString& title);
     void addLikedQuiz(size_t quizId);

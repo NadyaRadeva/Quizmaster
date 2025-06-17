@@ -1,0 +1,5 @@
+Player Petya Georgieva ptygrg 12345 0 1
+Player Nadya Radeva ngradeva 12345 0 1
+Player Hristian Hristov hristi 123456 0 1
+Player Daniel Georgiev daniel 1234 0 1
+Player Nicola Nicolov nic 123456 0 1

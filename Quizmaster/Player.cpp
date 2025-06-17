@@ -35,15 +35,10 @@ const QuizManager* Player::getQuizManager() const {
 	return this->quizManager;
 }
 
-Quiz* Player::addCreatedQuiz() {
+Quiz* Player::addCreatedQuiz(const MyString& title) {
 	if (!quizManager) {
 		throw std::runtime_error("QuizManager is not set!");
 	}
-
-	std::cout << "Enter quiz title: ";
-	char buffer[MAX_BUFFER_SIZE];
-	std::cin.getline(buffer, MAX_BUFFER_SIZE);
-	MyString title(buffer);
 
 	std::cout << "Enter number of questions: ";
 	int n;
@@ -57,9 +52,9 @@ Quiz* Player::addCreatedQuiz() {
 
 	for (int i = 0; i < n; ++i) {
 		std::cout << "Enter question " << (i + 1) << " type (T/F, SC, MC, ShA, MP): ";
-		char buffer1[MAX_BUFFER_SIZE];
-		std::cin.getline(buffer1, MAX_BUFFER_SIZE);
-		MyString type(buffer1);
+		char typeBuffer[MAX_BUFFER_SIZE_QUESTION_TYPE + 1];
+		std::cin.getline(typeBuffer, MAX_BUFFER_SIZE);
+		MyString type(typeBuffer);
 
 		Question* q = nullptr;
 		if (type == "T/F") {
@@ -78,23 +73,15 @@ Quiz* Player::addCreatedQuiz() {
 			q = createMPQuestion();
 		}
 		else {
-			std::cout << "Unknown question type! Skipping." << std::endl;
+			std::cout << "Unknown question type! Try again!\n";
 			--i;
 			continue;
 		}
+
 		questions.pushBack(q);
 	}
 
 	Quiz* newQuiz = new Quiz(title, this, questions, QuizStatus::PENDING, MyVector<const Player*>(), MyVector<const Player*>(), 0);
-
-	return newQuiz;
-}
-
-Quiz* Player::addCreatedQuiz(const MyString& title) {
-	Quiz* newQuiz = new Quiz();
-	newQuiz->setQuizTitle(title);
-	newQuiz->setQuizAuthor(this);
-	newQuiz->setQuizStatus(QuizStatus::PENDING);
 
 	createdQuizzes.pushBack(newQuiz);
 
@@ -102,6 +89,7 @@ Quiz* Player::addCreatedQuiz(const MyString& title) {
 		const_cast<QuizManager*>(quizManager)->addQuiz(newQuiz);
 	}
 
+	std::cout << "Quiz created and pending approval!";
 	return newQuiz;
 }
 
@@ -392,7 +380,7 @@ void Player::viewFinishedChallenges(const ChallengeManager& templateManager) con
 void Player::viewUser(const MyString& userName, const UserManager& userManager) const {
 	const User* user = userManager.findPlayerByUserName(userName);
 	if (!user) {
-		std::cout << "User with nickname \"" << userName << "\" not found.!";
+		std::cout << "User with username \"" << userName << "\" not found.!";
 		return;
 	}
 
@@ -574,14 +562,12 @@ void Player::print(std::ostream& os) const {
 
 	os << "Liked quizzes: " << std::endl;
 	for (size_t i = 0; i < this->likedQuizzes.getVectorSize(); ++i) {
-		os << "[" << this->likedQuizzes[i]->getQuizId() << "] ";
+		os << "[" << this->likedQuizzes[i]->getQuizId() << "] " << this->likedQuizzes[i]->getQuizTitle() << std::endl;
 	}
-
-	os << std::endl;
 
 	os << "Favourite quizzes: " << std::endl;
 	for (size_t i = 0; i < this->favouriteQuizzes.getVectorSize(); ++i) {
-		os << "[" << this->favouriteQuizzes[i]->getQuizId() << "] ";
+		os << "[" << this->favouriteQuizzes[i]->getQuizId() << "] " << this->favouriteQuizzes[i]->getQuizTitle() << std::endl;
 	}
 }
 
@@ -666,16 +652,16 @@ void Player::load(std::ifstream& in, QuizManager& quizManager) {
 		throw std::invalid_argument("Cannot open file!");
 	}
 
-	MyString username = MyString().readLine(in);
+	MyString username = MyString().readLine(in).trim();
 	this->setUserName(username);
 
-	MyString password = MyString().readLine(in);
+	MyString password = MyString().readLine(in).trim();
 	this->setUserPassword(password);
 
-	MyString firstName = MyString().readLine(in);
+	MyString firstName = MyString().readLine(in).trim();
 	this->setUserFirstName(firstName);
 
-	MyString lastName = MyString().readLine(in);
+	MyString lastName = MyString().readLine(in).trim();
 	this->setUserLastName(lastName);
 
 	int points = 0;
@@ -743,7 +729,6 @@ void Player::load(std::ifstream& in, QuizManager& quizManager) {
 		this->challenges.pushBack(cp);
 	}
 }
-
 
 Question* Player::createTFQuestion() {
 	std::cout << "Enter the question text:" << std::endl;

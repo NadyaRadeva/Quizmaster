@@ -87,12 +87,31 @@ bool UserManager::signupPlayer(const MyString& firstName, const MyString& lastNa
 }
 
 User* UserManager::login(const MyString& username, const MyString& password) {
+	//for (size_t i = 0; i < this->allUsers.getVectorSize(); ++i) {
+	//	if (this->allUsers[i]->getUserName() == username && this->allUsers[i]->getUserPassword() == password) {
+	//		this->currentUser = this->allUsers[i];
+	//		return this->currentUser;
+	//	}
+	//}
+
+	//std::cout << "[DEBUG] Login failed for username: " << username
+	//	<< ", password: " << password << std::endl;
+
 	for (size_t i = 0; i < this->allUsers.getVectorSize(); ++i) {
-		if (this->allUsers[i]->getUserName() == username && this->allUsers[i]->getUserPassword() == password) {
+		const MyString& storedUser = this->allUsers[i]->getUserName();
+		const MyString& storedPass = this->allUsers[i]->getUserPassword();
+
+		std::cout << "[DEBUG] Comparing storedUser: '" << storedUser.toChar()
+			<< "' with inputUser: '" << username.toChar() << "'\n";
+		std::cout << "[DEBUG] Comparing storedPass: '" << storedPass.toChar()
+			<< "' with inputPass: '" << password.toChar() << "'\n";
+
+		if (storedUser == username && storedPass == password) {
 			this->currentUser = this->allUsers[i];
 			return this->currentUser;
 		}
 	}
+
 	return nullptr;
 }
 
@@ -171,7 +190,9 @@ void UserManager::saveAllUsersToFile(const char* filename) const {
 
 void UserManager::loadAllUsersFromFile(const char* filename, QuizManager* quizManager, ReportManager* reportManager) {
 	std::ifstream in(filename);
-	if (!in.is_open()) return;
+	if (!in.is_open()) {
+		return;
+	}
 
 	size_t userCount = 0;
 	in >> userCount;
@@ -188,11 +209,14 @@ void UserManager::loadAllUsersFromFile(const char* filename, QuizManager* quizMa
 			Player* p = new Player();
 			p->load(in, *quizManager);
 			this->allUsers.pushBack(p);
+			std::cout << "Loaded user: " << p->getUserName() << " with password: " << p->getUserPassword() << std::endl;
+
 		}
 		else if (userType == UsersTypes::ADMINISTRATOR) {
 			Administrator* a = new Administrator();
 			a->load(in, reportManager);
 			this->allUsers.pushBack(a);
+			std::cout << "Loaded user: " << a->getUserName() << " with password: " << a->getUserPassword() << std::endl;
 		}
 	}
 	in.close();

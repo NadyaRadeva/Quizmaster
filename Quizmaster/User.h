@@ -35,8 +35,6 @@ public:
 	void unban();
 	bool checkPassword(const MyString& pass) const;
 
-
-
 private:
 	MyString firstName;
 	MyString lastName;
