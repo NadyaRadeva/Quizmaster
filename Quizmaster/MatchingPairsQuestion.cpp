@@ -1,4 +1,5 @@
 #include "MatchingPairsQuestion.h"
+#include "QuestionTypes.h"
 
 void MatchingPairsQuestion::printCorrectAnswer() const {
     std::cout << "Correct matching pairs:" << std::endl;
@@ -87,27 +88,74 @@ void MatchingPairsQuestion::saveToFile(std::ofstream& file) const {
         throw std::invalid_argument("Error opening file for writing!");
     }
 
+    file << static_cast<int>(QuestionTypes::MATCHING_PAIRS) << std::endl;
+
     file << this->getQuestionText() << std::endl;
+    file << this->getTotalPoints() << std::endl;
 
-    size_t leftSize = this->leftColumn.getVectorSize();
-    size_t rightSize = this->rightColumn.getVectorSize();
-    size_t maxSize = (leftSize > rightSize) ? leftSize : rightSize;
+    file << this->leftColumn.getVectorSize() << std::endl;
+    for (size_t i = 0; i < leftColumn.getVectorSize(); ++i) {
+        file << leftColumn[i] << std::endl;
+    }
 
-    for (size_t i = 0; i < maxSize; ++i) {
-        if (i < leftSize) {
-            file << char('A' + i) << ") " << leftColumn[i];
+    file << this->rightColumn.getVectorSize() << std::endl;
+    for (size_t i = 0; i < rightColumn.getVectorSize(); ++i) {
+        file << rightColumn[i] << std::endl;
+    }
+
+    file << this->correctAnswers << std::endl;
+}
+
+void MatchingPairsQuestion::loadFromFile(std::ifstream& file) {
+    if (!file.is_open()) {
+        throw std::invalid_argument("Error opening file for reading!");
+    }
+
+    MyString questionText;
+    readLineToMyStringMPQ(file, questionText);
+    this->setQuestionText(questionText);
+
+    int points = 0;
+    file >> points;
+    this->setTotalPoints(points);
+
+    size_t leftCount = 0;
+    file >> leftCount;
+    file.get();
+
+    MyVector<MyString> leftCol;
+    for (size_t i = 0; i < leftCount; ++i) {
+        MyString leftItem;
+        readLineToMyStringMPQ(file, leftItem);
+        leftCol.pushBack(leftItem);
+    }
+    this->setLeftColumnValues(leftCol);
+
+    size_t rightCount = 0;
+    file >> rightCount;
+    file.get();
+
+    MyVector<MyString> rightCol;
+    for (size_t i = 0; i < rightCount; ++i) {
+        MyString rightItem;
+        readLineToMyStringMPQ(file, rightItem);
+        rightCol.pushBack(rightItem);
+    }
+    this->setRightColumnValues(rightCol);
+
+    MyString correctAns;
+    readLineToMyStringMPQ(file, correctAns);
+    this->setCorrectAnswers(correctAns);
+}
+
+void MatchingPairsQuestion::readLineToMyStringMPQ(std::ifstream& file, MyString& str) {
+    str.clear();
+    char ch;
+    while (file.get(ch)) {
+        if (ch == '\n') {
+            break;
         }
-        else {
-            file << "   ";
-        }
-
-        file << "          ";
-
-        if (i < rightSize) {
-            file << char('a' + i) << ") " << rightColumn[i];
-        }
-
-        file << std::endl;
+        str.pushBack(ch);
     }
 }
 

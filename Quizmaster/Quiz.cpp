@@ -3,7 +3,7 @@
 size_t Quiz::ID = 0;
 
 size_t Quiz::getQuizId() const {
-    return this->ID;
+    return this->nextID;
 }
 
 const MyString& Quiz::getQuizTitle() const {
@@ -14,8 +14,12 @@ const Player* Quiz::getQuizAuthor() const {
     return this->author;
 }
 
-const MyVector<Question*> Quiz::getQuestiions() const {
-    return this->questions;
+Player* Quiz::getQuizAuthor() {
+	return this->author;
+}
+
+const MyVector<Question*>& Quiz::getQuestions() const {
+	return this->questions;
 }
 
 QuizStatus Quiz::getQuizStatus() const {
@@ -41,12 +45,110 @@ void Quiz::saveToFile(const MyString& filename) const {
 		throw std::invalid_argument("Failed to open file for writing!");
 	}
 
-	file << this->title << " - <" << this->questions.getVectorSize() << "> Questions" << std::endl;
-	file << "By " << this->author->getUserFirstName() << " " << this->author->getUserLastName() << "  @" << this->author->getUserName() << std::endl;
+	file << this->title << " - " << this->questions.getVectorSize() << " Questions\n";
+	file << "By: " << this->author->getUserFirstName() << " " << this->author->getUserLastName() << " @" << this->author->getUserName() << "\n\n";
 
 	for (size_t i = 0; i < this->questions.getVectorSize(); ++i) {
 		file << (i + 1) << ") ";
 		questions[i]->saveToFile(file);
+		file << '\n';
+	}
+
+	file.close();
+}
+
+void Quiz::loadFromFile(const MyString& filename) {
+	std::ifstream file(filename.toChar());
+	if (!file.is_open()) {
+		return;
+	}
+
+	freeQuestions();
+
+	MyString line;
+
+	line.readLine(file);
+	if (line.isEmpty()) {
+		return;
+	}
+
+	int dashPos = -1;
+	for (size_t i = 0; i < line.getLength(); i++)
+	{
+		if (line[i] == '-')
+		{
+			dashPos = (int)i;
+			break;
+		}
+	}
+	if (dashPos == -1) return;
+
+	int titleLen = dashPos;
+	if (titleLen > 0 && line[titleLen - 1] == ' ')
+		titleLen--;
+
+	MyString titleStr = line.subStr(0, titleLen);
+	this->title = titleStr;
+
+	int numQuestions = 0;
+	size_t i = dashPos + 1;
+
+	while (i < line.getLength() && line[i] == ' ') i++;
+
+	while (i < line.getLength() && line[i] >= '0' && line[i] <= '9')
+	{
+		numQuestions = numQuestions * 10 + (line[i] - '0');
+		i++;
+	}
+	if (numQuestions <= 0) {
+		return;
+	}
+
+	line.readLine(file);
+	if (line.isEmpty()) {
+		return;
+	}
+
+	int atPos = -1;
+	for (size_t j = 0; j < line.getLength(); j++)
+	{
+		if (line[j] == '@')
+		{
+			atPos = (int)j;
+			break;
+		}
+	}
+	if (atPos == -1) return;
+
+	MyString username;
+	size_t pos = atPos + 1;
+	while (pos < line.getLength() && line[pos] != ' ')
+	{
+		username += line[pos];
+		pos++;
+	}
+
+	line.readLine(file);
+
+	for (int q = 0; q < numQuestions; q++)
+	{
+		line.readLine(file);
+		if (line.isEmpty()) {
+			return;
+		}
+
+		int qType;
+		file >> qType;
+		file.ignore(1000, '\n');
+
+		Question* question = Question::createFromType((QuestionTypes)qType);
+		if (!question) {
+			return;
+		}
+
+		question->loadFromFile(file);
+
+		questions.pushBack(question);
 	}
 
 	file.close();
@@ -84,7 +186,7 @@ void Quiz::runTestMode(Player& player, bool shuffle) {
 	std::cout << "Running quiz in TEST MODE." << std::endl;
 
 	for (size_t i = 0; i < questionsToAsk.getVectorSize(); ++i) {
-		std::cout << "Question " << (i + 1) << ": " << questionsToAsk[i]->getQuestionText() << "\n";
+		std::cout << "Question " << (i + 1) << ": " << questionsToAsk[i]->getQuestionText() << std::endl;
 
 		double score = questionsToAsk[i]->answerEvaluation();
 
@@ -96,6 +198,9 @@ void Quiz::runTestMode(Player& player, bool shuffle) {
 	std::cout << "Test mode complete. No points were added."<<std::endl;
 }
 
+MyString Quiz::getQuizFilename(int quizId) {
+	return "quiz_" + MyString::intToString(quizId) + ".txt";
+}
 
 void Quiz::addLike(const Player& player) {
 	for (size_t i = 0; i < likedBy.getVectorSize(); ++i) {
@@ -144,7 +249,7 @@ void Quiz::shuffleQuestionsUsingRand(MyVector<Question*>& quiz) {
 }
 
 void Quiz::copyFrom(const Quiz& other) {
-	this->ID = other.ID;
+	this->nextID = other.nextID;
 	this->title = other.title;
 	this->author = other.author;
 	questions.clear();
@@ -183,7 +288,7 @@ void Quiz::freeQuiz() {
 }
 
 Quiz::Quiz(const MyString& title, const Player* author, const MyVector<Question*> questions, QuizStatus status, const MyVector<const Player*> likedBy, const MyVector<const Player*> favouriteBy, size_t timesAttempted) {
-	++this->ID;
+	this->nextID = ++this->ID;
     setQuizTitle(title);
     setQuizAuthor(author);
     setQuestions(questions);
@@ -194,7 +299,7 @@ Quiz::Quiz(const MyString& title, const Player* author, const MyVector<Question*
 }
 
 Quiz::Quiz() {
-	++this->ID;
+	this->nextID = ++this->ID;
 	this->title = "Untitled Quiz";
 	this->author = nullptr;
 	this->status = QuizStatus::PENDING;
@@ -237,12 +342,15 @@ void Quiz::setQuizAuthor(const Player* author) {
 	this->author = const_cast<Player*>(author);
 }
 
-void Quiz::setQuestions(const MyVector<Question*> questions) {
+void Quiz::setQuestions(const MyVector<Question*>& questions) {
 	if (questions.isEmpty()) {
 		throw std::invalid_argument("Quiz must have at least one question!");
 	}
 
-	this->questions = questions;
+	this->questions.clear();
+	for (size_t i = 0; i < questions.getVectorSize(); i++) {
+		this->questions.pushBack(questions[i]->clone());
+	}
 }
 
 void Quiz::setQuizStatus(QuizStatus status) {

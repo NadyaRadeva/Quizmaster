@@ -23,10 +23,13 @@ public:
 	double answerEvaluation() override;
 	Question* clone() const override;
 	void saveToFile(std::ofstream& file) const override;
+	void loadFromFile(std::ifstream& file) override;
 
 private:
 	MyVector<MyString> options;
 	MyVector<char> correctAnswers;
+
+	static void readLineFromFile(std::ifstream& file, MyString& line);
 };
 
 #endif // !_MULTIPLECHOICEQUESTION_H

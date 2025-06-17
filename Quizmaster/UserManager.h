@@ -1,10 +1,18 @@
 #ifndef _USERMANAGER_H
 #define _USERMANAGER_H
 
+#include "MyString.h"
 #include "MyVector.hpp"
 #include "User.h"
-#include "Player.h"
-#include "Administrator.h"
+//#include "QuizManager.h"
+//#include "ReportManager.h"
+#include "UserTypes.h"
+
+class Administrator;
+class Player;
+class ReportManager;
+class QuizManager;
+
 
 class UserManager {
 public:
@@ -27,10 +35,14 @@ public:
 	void logout();
 
 	void banUser(const MyString& username);
+	void addAdministrator(Administrator* admin);
 
 	void quit();
 
-	const User* findPlayerByUserName(const MyString& userName) const;
+	Player* findPlayerByUserName(const MyString& userName) const;
+
+	void saveAllUsersToFile(const char* filename) const;
+	void loadAllUsersFromFile(const char* filename, QuizManager* quizManager, ReportManager* reportManager);
 
 private:
 	MyVector<User*> allUsers;

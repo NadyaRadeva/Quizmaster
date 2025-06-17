@@ -27,6 +27,7 @@ public:
 	void markCompleted();
 
 	void print(std::ostream& os) const;
+	void load(std::istream& in);
 
 private:
 	MyString templateId;

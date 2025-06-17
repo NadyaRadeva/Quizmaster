@@ -35,6 +35,7 @@ public:
     double answerEvaluation() override;
     Question* clone() const override;
     void saveToFile(std::ofstream& file) const override;
+	void loadFromFile(std::ifstream& file) override;
 
 private:
     MyString answers[NUMBER_OF_ANSWERS];

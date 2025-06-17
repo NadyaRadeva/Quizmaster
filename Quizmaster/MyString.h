@@ -32,6 +32,7 @@ public:
 	bool isNumber();
 	static MyString intToString(int num);
 	MyString removeSpaces() const;
+	MyString subStr(size_t start, size_t length) const;
 
 	//Case insensitivity
 	bool isLowerCase(char ch) const;
@@ -52,6 +53,12 @@ public:
 	const char& operator[](size_t index) const;
 
 	const char* toChar() const;
+	void myAppend(char c);
+	MyString readLine(std::istream& in);
+	int toInt() const;
+	bool isEmpty() const;
+	void clear();
+	void pushBack(char c);
 
 	//Number handling
 	static int countDigits(int num);

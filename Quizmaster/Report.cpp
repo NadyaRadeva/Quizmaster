@@ -70,5 +70,38 @@ void Report::printReportDetails(std::ostream& os, const QuizManager& quizManager
 		return;
 	}
 
-	os << this->dateReported << " | sent by " << this->reporter << " | quiz id " << quiz->getQuizId() << " by " << quiz->getQuizAuthor()->getUserName() << " | reason: " << this->reason << std::endl;
+	os << this->dateReported << " | sent by " << (reporter ? reporter->getUserName() : "Unknown") << " | quiz id " << quiz->getQuizId() << " by " << quiz->getQuizAuthor()->getUserName() << " | reason: " << this->reason << std::endl;
+}
+
+void Report::save(std::ofstream& out) const {
+	out << (int)dateReported << std::endl;
+	if (reporter) {
+		out << reporter->getUserName() << std::endl;
+	}
+	else {
+		out << "NULL" << std::endl;
+	}
+	out << quizID << std::endl;
+	out << reason << std::endl;
+}
+
+void Report::load(std::ifstream& in, const UserManager& userManager) {
+	MyString reporterUsername;
+	reporterUsername = reporterUsername.readLine(in);
+
+	in >> quizID;
+	in.ignore();
+
+	reason = reason.readLine(in);
+
+	int timestamp;
+	in >> timestamp;
+	in.ignore();
+	dateReported = static_cast<time_t>(timestamp);
+
+	const Player* playerPtr = userManager.findPlayerByUserName(reporterUsername);
+	if (!playerPtr) {
+		throw std::runtime_error("Reporter not found!");
+	}
+	reporter = playerPtr;
 }

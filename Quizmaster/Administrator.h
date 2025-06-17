@@ -2,13 +2,19 @@
 #define _ADMINISTRATOR_H
 
 #include "User.h"
-#include "QuizManager.h"
+//#include "QuizManager.h"
 #include "MyString.h"
 #include "Report.h"
-#include "ReportManager.h"
+//#include "ReportManager.h"
+//#include "UserManager.h"
 #include<iostream>
 
+
+class QuizManager;
 class ReportManager;
+class UserManager;
+class Player;
+class Report;
 
 class Administrator : public User {
 public:
@@ -26,6 +32,9 @@ public:
     void removeQuiz(size_t quizId);
     void reviewReport(const Report& report);
     void listPendingQuizzes() const;
+    void viewAllReports() const;
+    void banUser(const MyString& username, UserManager* userManager);
+    void sendMessage(Player& player, const MyString& content);
 
     // Overrides
     bool isAdmin() const override;
@@ -33,11 +42,12 @@ public:
     User* clone() const override;
     void print(std::ostream& os) const override;
 
+    void save(std::ostream& out) const;
+    void load(std::istream& in, ReportManager* reportManager);
+
 private:
     QuizManager* quizManager = nullptr;
     ReportManager* reportManager = nullptr;
-
-    void sendMessage(const Player& player, const MyString& content);
 };
 
 #endif // !_ADMINISTRATOR_H

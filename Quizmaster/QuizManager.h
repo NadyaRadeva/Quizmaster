@@ -2,8 +2,11 @@
 #define _QUIZMANAGER_H
 
 #include "MyVector.hpp"
+#include "MyString.h"
 #include "Quiz.h"
 #include<stdexcept>
+
+class Quiz;
 
 class QuizManager {
 public:
@@ -24,6 +27,9 @@ public:
 	void removeQuizById(size_t quizId);
 
 	void clear();
+
+	void saveQuizById(int quizId);
+	Quiz* loadQuizById(int quizId);
 
 private:
 	MyVector<Quiz*> allQuizzes;

@@ -25,11 +25,14 @@ public:
 	double answerEvaluation() override;
 	Question* clone() const override;
 	void saveToFile(std::ofstream& file) const override;
+	void loadFromFile(std::ifstream& file) override;
 
 private:
 	MyVector<MyString> rightColumn;
 	MyVector<MyString> leftColumn;
 	MyString correctAnswers;
+
+	static void readLineToMyStringMPQ(std::ifstream& file, MyString& str);
 };
 
 #endif // !_MATCHINGPAIRSQUESTION_H

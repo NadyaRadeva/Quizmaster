@@ -139,6 +139,7 @@
     <ClCompile Include="MyVector.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Question.cpp" />
+    <ClCompile Include="QuestionTypes.cpp" />
     <ClCompile Include="Quiz.cpp" />
     <ClCompile Include="QuizManager.cpp" />
     <ClCompile Include="QuizStatuses.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="TrueOrFalseQuestion.cpp" />
     <ClCompile Include="User.cpp" />
     <ClCompile Include="UserManager.cpp" />
+    <ClCompile Include="UserTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Administrator.h" />
@@ -163,6 +165,7 @@
     <ClInclude Include="MyVector.hpp" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Question.h" />
+    <ClInclude Include="QuestionTypes.h" />
     <ClInclude Include="Quiz.h" />
     <ClInclude Include="QuizManager.h" />
     <ClInclude Include="QuizStatuses.h" />
@@ -174,6 +177,7 @@
     <ClInclude Include="TrueOrFalseQuestion.h" />
     <ClInclude Include="User.h" />
     <ClInclude Include="UserManager.h" />
+    <ClInclude Include="UserTypes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

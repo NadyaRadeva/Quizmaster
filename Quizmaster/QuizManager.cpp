@@ -39,7 +39,11 @@ QuizManager::~QuizManager() {
 }
 
 void QuizManager::setAllQuizzes(const MyVector<Quiz*>& allQuizzes) {
-	this->allQuizzes = allQuizzes;
+	this->freeQuizzes();
+	this->allQuizzes.clear();
+	for (size_t i = 0; i < allQuizzes.getVectorSize(); ++i) {
+		this->allQuizzes.pushBack(new Quiz(*allQuizzes[i]));
+	}
 }
 
 Quiz* QuizManager::getQuizById(size_t quizId) const {
@@ -56,17 +60,17 @@ const MyVector<Quiz*>& QuizManager::getAllQuizzes() const {
 }
 
 void QuizManager::addQuiz(Quiz* quiz) {
-	if (quiz == nullptr) {
+	if (!quiz) {
 		throw std::invalid_argument("Quiz cannot be null!");
 	}
 
-	for (size_t i = 0; i < this->allQuizzes.getVectorSize(); ++i) {
-		if (this->allQuizzes[i]->getQuizId() == quiz->getQuizId()) {
+	for (size_t i = 0; i < allQuizzes.getVectorSize(); ++i) {
+		if (allQuizzes[i]->getQuizId() == quiz->getQuizId()) {
 			throw std::runtime_error("Quiz with the same ID already exists!");
 		}
 	}
 
-	this->allQuizzes.pushBack(quiz);
+	allQuizzes.pushBack(quiz);
 }
 
 void QuizManager::removeQuizById(size_t quizId) {
@@ -84,6 +88,21 @@ void QuizManager::removeQuizById(size_t quizId) {
 void QuizManager::clear() {
 	this->freeQuizzes();
 	this->allQuizzes = MyVector<Quiz*>();
+}
+
+void QuizManager::saveQuizById(int quizId) {
+	MyString filename = Quiz::getQuizFilename(quizId);
+	Quiz* quiz = getQuizById(quizId);
+	if (quiz != nullptr) {
+		quiz->saveToFile(filename);
+	}
+}
+
+Quiz* QuizManager::loadQuizById(int quizId) {
+	MyString filename = Quiz::getQuizFilename(quizId);
+	Quiz* quiz = new Quiz();
+	quiz->loadFromFile(filename);
+	return quiz;
 }
 
 void QuizManager::copyFrom(const QuizManager& other) {

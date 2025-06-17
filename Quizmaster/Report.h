@@ -34,6 +34,9 @@ public:
 	// Print report details
 	void printReportDetails(std::ostream& os, const QuizManager& quizManager) const;
 
+	void save(std::ofstream& out) const;
+	void load(std::ifstream& in, const UserManager& userManager);
+
 private:
 	time_t dateReported;
 	const Player* reporter;

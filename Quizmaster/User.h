@@ -2,6 +2,7 @@
 #define _USER_H
 
 #include "MyString.h"
+//#include "QuizManager.h"
 #include<iostream>
 #include<stdexcept>
 #include<fstream>
@@ -33,6 +34,8 @@ public:
 	void ban();
 	void unban();
 	bool checkPassword(const MyString& pass) const;
+
+
 
 private:
 	MyString firstName;

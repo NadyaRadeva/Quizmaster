@@ -4,7 +4,12 @@
 #include "MyVector.hpp"
 #include "Quiz.h"
 #include "QuizManager.h"
+//#include "UserManager.h"
 #include "Report.h"
+#include<iostream>
+
+class QuizManager;
+class UserManager;
 
 class ReportManager {
 public:
@@ -15,6 +20,9 @@ public:
     void printAllReports(const QuizManager& quizManager, std::ostream& os) const;
 
     void removeReport(size_t index);
+
+    void saveReports(const MyString& filepath) const;
+    void loadReports(const MyString& filepath, const UserManager& userManager);
 
 private:
 	MyVector<Report> allReports;

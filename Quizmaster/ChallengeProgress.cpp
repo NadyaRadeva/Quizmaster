@@ -108,3 +108,18 @@ void ChallengeProgress::print(std::ostream& os) const {
 		os << "Time Completed: Not completed yet" << std::endl;
 	}
 }
+
+void ChallengeProgress::load(std::istream& in) {
+	MyString line;
+
+	this->templateId = line.readLine(in);
+
+	line = line.readLine(in);
+	this->progress = line.toInt();
+
+	line = line.readLine(in);
+	this->isCompleted = (line.toInt() != 0);
+
+	line = line.readLine(in);
+	this->timeCompleted = static_cast<time_t>(line.toInt());
+}
