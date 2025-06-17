@@ -188,6 +188,9 @@ MyString MyString::readLine(std::istream& in) {
         if (ch == '\n') {
             break;
         }
+        if (ch == '\r') {
+            continue;
+        }
         line.myAppend(ch);
     }
 
@@ -247,6 +250,34 @@ void MyString::pushBack(char c) {
 
     this->str = newData;
     ++this->len;
+}
+
+MyString MyString::trim() const {
+    size_t start = 0;
+    while (start < this->len && (this->str[start] == ' ' || this->str[start] == '\t' || this->str[start] == '\n' || this->str[start] == '\r')) {
+        ++start;
+    }
+
+    if (start == this->len) {
+        return MyString("");
+    }
+
+    size_t end = this->len - 1;
+    while (end > start && (this->str[end] == ' ' || this->str[end] == '\t' || this->str[end] == '\n' || this->str[end] == '\r')) {
+        --end;
+    }
+
+    size_t newLength = end - start + 1;
+    char* newData = new char[newLength + 1];
+    for (size_t i = 0; i < newLength; ++i) {
+        newData[i] = this->str[start + i];
+    }
+    newData[newLength] = '\0';
+
+    MyString trimmed;
+    trimmed.str = newData;
+    trimmed.len = newLength;
+    return trimmed;
 }
 
 int MyString::countDigits(int num) {

@@ -38,6 +38,12 @@ size_t Quiz::getTimesAttempted() const {
 	return this->timesAttempted;
 }
 
+void Quiz::addQuestion(Question* question) {
+	if (question) {
+		questions.pushBack(question);
+	}
+}
+
 void Quiz::saveToFile(const MyString& filename) const {
 	std::ofstream file(filename.toChar());
 

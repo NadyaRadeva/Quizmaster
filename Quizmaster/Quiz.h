@@ -46,6 +46,8 @@ public:
 	const MyVector<const Player*> getQuizFavouriteByList() const;
 	size_t getTimesAttempted() const;
 
+	void addQuestion(Question* question);
+
 	//Save entire quiz in text file
 	void saveToFile(const MyString& filename) const;
 	void loadFromFile(const MyString& filename);

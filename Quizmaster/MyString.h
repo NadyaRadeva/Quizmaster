@@ -59,6 +59,7 @@ public:
 	bool isEmpty() const;
 	void clear();
 	void pushBack(char c);
+	MyString trim() const;
 
 	//Number handling
 	static int countDigits(int num);
