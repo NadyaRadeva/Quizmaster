@@ -191,28 +191,33 @@ Player* UserManager::findPlayerByUserName(const MyString& userName) const {
 void UserManager::saveAllUsersToFile(const char* filename) const {
 	std::ofstream out(filename);
 	if (!out.is_open()) {
+		std::cerr << "Failed to open " << filename << " for saving users!" << std::endl;
 		return;
 	}
 
-	out << this->allUsers.getVectorSize() << std::endl;
+	size_t userCount = allUsers.getVectorSize();
+	out << userCount << '\n';
 
-	for (size_t i = 0; i < this->allUsers.getVectorSize(); i++) {
+	for (size_t i = 0; i < this->allUsers.getVectorSize(); ++i) {
 		User* user = this->allUsers[i];
+
 		if (Player* p = dynamic_cast<Player*>(user)) {
-			out << static_cast<int>(UsersTypes::PLAYER) << std::endl;
-			p->save();
+			out << "Player" << '\n';
+			out << p->getUserFirstName() << " " << p->getUserLastName() << " " << p->getUserName() << " " << p->getUserPassword() << " " << p->getPoints() << " " << p->getLevel() << '\n';
 		}
 		else if (Administrator* a = dynamic_cast<Administrator*>(user)) {
-			out << static_cast<int>(UsersTypes::ADMINISTRATOR) << std::endl;
-			a->save(out);
+			out << "Administrator" << '\n';
+			out << a->getUserFirstName() << " " << a->getUserLastName() << " " << a->getUserName() << " " << a->getUserPassword() << '\n';
 		}
 	}
+
 	out.close();
 }
 
 void UserManager::loadAllUsersFromFile(const char* filename, QuizManager* quizManager, ReportManager* reportManager) {
-	std::ifstream in(filename);
+	/*std::ifstream in(filename);
 	if (!in.is_open()) {
+		std::cerr << "Failed to open " << filename << " for loading users!" << std::endl;
 		return;
 	}
 
@@ -220,27 +225,106 @@ void UserManager::loadAllUsersFromFile(const char* filename, QuizManager* quizMa
 	in >> userCount;
 	in.ignore();
 
-	for (size_t i = 0; i < userCount; i++) {
+	for (size_t i = 0; i < userCount; ++i) {
 		int userTypeInt = 0;
 		in >> userTypeInt;
-		in.ignore();
 
 		UsersTypes userType = static_cast<UsersTypes>(userTypeInt);
 
 		if (userType == UsersTypes::PLAYER) {
-			Player* p = new Player();
-			p->load(in, *quizManager);
-			this->allUsers.pushBack(p);
-			std::cout << "Loaded user: " << p->getUserName() << " with password: " << p->getUserPassword() << std::endl;
+			MyString firstName, lastName, username, password;
+			int points, level;
+			in >> firstName >> lastName >> username >> password >> points >> level;
+			in.ignore();
 
+			MyVector<Quiz*> createdQuizzes;
+			MyVector<Quiz*> likedQuizzes;
+			MyVector<Quiz*> favouriteQuizzes;
+			MyVector<ChallengeProgress> challenges;
+			MyVector<Message> messages;
+
+			Player* p = new Player(firstName, lastName, username, password, points, level, createdQuizzes, likedQuizzes, favouriteQuizzes, challenges, messages, quizManager);
+			p->setQuizManager(quizManager);
+			this->allUsers.pushBack(p);
+
+			std::cout << "Loaded Player: " << username << " with password: " << password << std::endl;
 		}
 		else if (userType == UsersTypes::ADMINISTRATOR) {
-			Administrator* a = new Administrator();
-			a->load(in, reportManager);
+			MyString firstName, lastName, username, password;
+			in >> firstName >> lastName >> username >> password;
+			in.ignore();
+
+			Administrator* a = new Administrator(firstName, lastName, username, password, quizManager, reportManager);
 			this->allUsers.pushBack(a);
-			std::cout << "Loaded user: " << a->getUserName() << " with password: " << a->getUserPassword() << std::endl;
+
+			std::cout << "Loaded Admin: " << username << " with password: " << password << std::endl;
 		}
 	}
+
+	in.close();*/
+
+	std::ifstream in(filename);
+	if (!in.is_open()) {
+		std::cerr << "Failed to open " << filename << " for loading users!" << std::endl;
+		return;
+	}
+
+	size_t userCount = 0;
+	in >> userCount;
+	in.ignore();
+
+	for (size_t i = 0; i < userCount; ++i) {
+		MyString userTypeStr;
+		if (!(in >> userTypeStr)) {
+			std::cerr << "Failed to read user type!" << std::endl;
+			break;
+		}
+
+		if (userTypeStr == "Player") {
+			MyString firstName, lastName, username, password;
+			int points = 0, level = 1;
+
+			if (!(in >> firstName >> lastName >> username >> password >> points >> level)) {
+				std::cerr << "Error reading Player data from file!" << std::endl;
+				break;
+			}
+			in.ignore(); 
+
+			MyVector<Quiz*> createdQuizzes;
+			MyVector<Quiz*> likedQuizzes;
+			MyVector<Quiz*> favouriteQuizzes;
+			MyVector<ChallengeProgress> challenges;
+			MyVector<Message> messages;
+
+			Player* p = new Player(firstName, lastName, username, password,
+				size_t(points), size_t(level),
+				createdQuizzes, likedQuizzes, favouriteQuizzes,
+				challenges, messages, quizManager);
+
+			this->allUsers.pushBack(p);
+
+			std::cout << "Loaded Player: " << username << std::endl;
+		}
+		else if (userTypeStr == "Administrator") {
+			MyString firstName, lastName, username, password;
+
+			if (!(in >> firstName >> lastName >> username >> password)) {
+				std::cerr << "Error reading Administrator data from file!" << std::endl;
+				break;
+			}
+			in.ignore();
+
+			Administrator* a = new Administrator(firstName, lastName, username, password, quizManager, reportManager);
+			this->allUsers.pushBack(a);
+
+			std::cout << "Loaded Administrator: " << username << std::endl;
+		}
+		else {
+			std::cerr << "Unknown user type: " << userTypeStr << std::endl;
+			break;
+		}
+	}
+
 	in.close();
 }
 

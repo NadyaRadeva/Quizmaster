@@ -85,7 +85,7 @@ void MultipleChoiceQuestion::printCorrectAnswer() const {
 }
 
 double MultipleChoiceQuestion::answerEvaluation() {
-    std::cout << "Answer the following question (enter letters, comma-separated, e.g., A,C):" << std::endl;
+    std::cout << "Answer the following question (enter letters, comma-separated, numbers, e.g., A,C):" << std::endl;
     for (size_t i = 0; i < options.getVectorSize(); ++i) {
         std::cout << char('A' + i) << ") " << options[i] << std::endl;
     }
@@ -95,7 +95,7 @@ double MultipleChoiceQuestion::answerEvaluation() {
     std::cin >> answerInput;
     for (size_t i = 0; i < answerInput.getLength(); ++i) {
         char c = answerInput[i];
-        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ',')) {
+        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == ',')) {
             throw std::invalid_argument("Invalid character in input!");
         }
     }
