@@ -198,31 +198,33 @@ MyString MyString::readLine(std::istream& in) {
 }
 
 int MyString::toInt() const {
-    if (!this->str) {
-        return 0;
+    if (!this->str || this->len == 0) {
+        throw std::invalid_argument("toInt: empty string!");
     }
 
-    int result = 0;
     size_t i = 0;
     bool negative = false;
 
     if (this->str[0] == '-') {
         negative = true;
         i = 1;
+        if (this->len == 1) {
+            throw std::invalid_argument("toInt: no digits after minus!");
+        }
     }
 
+    int result = 0;
     for (; i < this->len; ++i) {
         char c = this->str[i];
-
         if (c < '0' || c > '9') {
-            throw std::invalid_argument("toInt: invalid character");
+            throw std::invalid_argument("toInt: invalid character!");
         }
-
         result = result * 10 + (c - '0');
     }
 
     return negative ? -result : result;
 }
+
 
 bool MyString::isEmpty() const {
     return this->len == 0;
@@ -351,7 +353,6 @@ MyString& MyString::operator=(const MyString& other) {
 }
 
 MyString::MyString(MyString&& other) noexcept {
-    this->str = nullptr;
     moveFrom(std::move(other));
 }
 

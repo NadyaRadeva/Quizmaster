@@ -8,6 +8,8 @@
 #include<fstream>
 #include<stdexcept>
 
+const size_t MAX_LEN_MULTIPLE_CHOICE_BUFFER = 10000;
+
 class MultipleChoiceQuestion : public Question {
 public:
 	MultipleChoiceQuestion(const MyString& questionText, size_t totalPoints, const MyVector<MyString>& options, const MyVector<char>& correctAnswers);

@@ -6,6 +6,8 @@
 #include "MyString.h"
 #include<ctime>
 
+const size_t MAX_BUFFER_SIZE_CHALLENGE_PROGRESS = 10000;
+
 class ChallengeProgress {
 public:
 	ChallengeProgress(const MyString& templateId, size_t progress, bool isCompleted, time_t timeCompleted);

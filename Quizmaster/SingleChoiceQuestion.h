@@ -12,6 +12,7 @@ const size_t ANSWER_A_INDEX = 0;
 const size_t ANSWER_B_INDEX = 1;
 const size_t ANSWER_C_INDEX = 2;
 const size_t ANSWER_D_INDEX = 3;
+const size_t MAX_SIZE_SINGLE_CHOICE_BUFFER = 10000;
 
 class SingleChoiceQuestion : public Question {
 public:

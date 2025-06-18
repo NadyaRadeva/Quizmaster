@@ -1,6 +1,5 @@
 #include "ReportManager.h"
 
-
 void ReportManager::addReport(const Report& report) {
 	allReports.pushBack(report);
 }
@@ -41,7 +40,7 @@ void ReportManager::saveReports(const MyString& filepath) const {
 void ReportManager::loadReports(const MyString& filepath, const UserManager& userManager) {
 	std::ifstream in(filepath.toChar());
 	if (!in.is_open()) {
-		throw std::runtime_error("Could not open report file for loading.");
+		throw std::runtime_error("Could not open report file for loading!");
 	}
 
 	size_t count;

@@ -38,11 +38,17 @@ size_t Question::getTotalPoints() const {
 
 Question* Question::createFromType(QuestionTypes type) {
 	switch (type) {
-	case QuestionTypes::TRUE_OR_FALSE: return new TrueOrFalseQuestion();
-	case QuestionTypes::SINGLE_CHOICE: return new SingleChoiceQuestion();
-	case QuestionTypes::MULTIPLE_CHOICE: return new MultipleChoiceQuestion();
-	case QuestionTypes::SHORT_ANSWER: return new ShortAnswerQuestion();
-	case QuestionTypes::MATCHING_PAIRS: return new MatchingPairsQuestion();
-	default: return nullptr;
+	case QuestionTypes::TRUE_OR_FALSE: 
+		return new TrueOrFalseQuestion();
+	case QuestionTypes::SINGLE_CHOICE: 
+		return new SingleChoiceQuestion();
+	case QuestionTypes::MULTIPLE_CHOICE: 
+		return new MultipleChoiceQuestion();
+	case QuestionTypes::SHORT_ANSWER: 
+		return new ShortAnswerQuestion();
+	case QuestionTypes::MATCHING_PAIRS: 
+		return new MatchingPairsQuestion();
+	default: 
+		return nullptr;
 	}
 }

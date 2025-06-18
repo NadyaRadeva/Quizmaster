@@ -71,38 +71,40 @@ void Quiz::loadFromFile(const MyString& filename) {
 
 	freeQuestions();
 
-	MyString line;
+	char buffer[MAX_BUFFER_QUIZ_CLASS + 1];
 
-	line.readLine(file);
+	// Quiz Name - <Number> Questions
+	if (!file.getline(buffer, MAX_BUFFER_QUIZ_CLASS)) return;
+	MyString line(buffer);
 	if (line.isEmpty()) {
 		return;
 	}
 
+	// Parsing of title and number of questions
 	int dashPos = -1;
-	for (size_t i = 0; i < line.getLength(); i++)
-	{
-		if (line[i] == '-')
-		{
+	for (size_t i = 0; i < line.getLength(); ++i) {
+		if (line[i] == '-') {
 			dashPos = (int)i;
 			break;
 		}
 	}
-	if (dashPos == -1) return;
+	if (dashPos == -1) {
+		return;
+	}
 
 	int titleLen = dashPos;
-	if (titleLen > 0 && line[titleLen - 1] == ' ')
+	if (titleLen > 0 && line[titleLen - 1] == ' ') {
 		titleLen--;
+	}
 
 	MyString titleStr = line.subStr(0, titleLen);
 	this->title = titleStr;
 
 	int numQuestions = 0;
 	size_t i = dashPos + 1;
-
 	while (i < line.getLength() && line[i] == ' ') i++;
 
-	while (i < line.getLength() && line[i] >= '0' && line[i] <= '9')
-	{
+	while (i < line.getLength() && line[i] >= '0' && line[i] <= '9') {
 		numQuestions = numQuestions * 10 + (line[i] - '0');
 		i++;
 	}
@@ -110,42 +112,51 @@ void Quiz::loadFromFile(const MyString& filename) {
 		return;
 	}
 
-	line.readLine(file);
-	if (line.isEmpty()) {
+	// By: FirstName LastName @username
+	if (!file.getline(buffer, MAX_BUFFER_QUIZ_CLASS)) {
 		return;
 	}
 
+	line = MyString(buffer);
+	if (line.isEmpty()) return;
+
 	int atPos = -1;
-	for (size_t j = 0; j < line.getLength(); j++)
-	{
-		if (line[j] == '@')
-		{
+	for (size_t j = 0; j < line.getLength(); ++j) {
+		if (line[j] == '@') {
 			atPos = (int)j;
 			break;
 		}
 	}
-	if (atPos == -1) return;
+	if (atPos == -1) {
+		return;
+	}
 
 	MyString username;
 	size_t pos = atPos + 1;
-	while (pos < line.getLength() && line[pos] != ' ')
-	{
+	while (pos < line.getLength() && line[pos] != ' ') {
 		username += line[pos];
 		pos++;
 	}
 
-	line.readLine(file);
+	// Skipping the empty line between author and first question
+	if (!file.getline(buffer, MAX_BUFFER_QUIZ_CLASS)) {
+		return;
+	}
 
-	for (int q = 0; q < numQuestions; q++)
-	{
-		line.readLine(file);
+	// Reading each question
+	for (int q = 0; q < numQuestions; ++q) {
+		// Reading type line
+		if (!file.getline(buffer, MAX_BUFFER_QUIZ_CLASS)) {
+			return;
+		}
+		line = MyString(buffer);
 		if (line.isEmpty()) {
 			return;
 		}
 
 		int qType;
 		file >> qType;
-		file.ignore(1000, '\n');
+		file.ignore(MAX_BUFFER_QUIZ_CLASS, '\n');
 
 		Question* question = Question::createFromType((QuestionTypes)qType);
 		if (!question) {
@@ -153,7 +164,6 @@ void Quiz::loadFromFile(const MyString& filename) {
 		}
 
 		question->loadFromFile(file);
-
 		questions.pushBack(question);
 	}
 

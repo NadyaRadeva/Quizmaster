@@ -13,6 +13,7 @@ class Player;
 class ReportManager;
 class QuizManager;
 
+const size_t MAX_BUFFER_SIZE_USER_MANAGER_CLASS = 10000;
 
 class UserManager {
 public:
