@@ -77,8 +77,8 @@ public:
 	const QuizManager* getQuizManager() const;
 
     // Quiz Management
-	void createQuiz();
-    Quiz* addCreatedQuiz();
+	//void createQuiz();
+   // Quiz* addCreatedQuiz();
     Quiz* addCreatedQuiz(const MyString& title);
     void addLikedQuiz(size_t quizId);
     void removeLikedQuiz(size_t quizId);
