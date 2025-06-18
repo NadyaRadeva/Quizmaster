@@ -12,6 +12,8 @@
 #include<iostream>
 #include<fstream>
 
+const size_t MAX_BUFFER_QUIZ_CLASS = 10000;
+
 class User;
 class Player;
 

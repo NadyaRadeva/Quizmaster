@@ -52,8 +52,8 @@ Quiz* Player::addCreatedQuiz(const MyString& title) {
 
 	for (int i = 0; i < n; ++i) {
 		std::cout << "Enter question " << (i + 1) << " type (T/F, SC, MC, ShA, MP): ";
-		char typeBuffer[MAX_BUFFER_SIZE_QUESTION_TYPE + 1];
-		std::cin.getline(typeBuffer, MAX_BUFFER_SIZE);
+		char typeBuffer[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+		std::cin.getline(typeBuffer, MAX_BUFFER_SIZE_PLAYER_CLASS);
 		MyString type(typeBuffer);
 
 		Question* q = nullptr;
@@ -334,7 +334,9 @@ void Player::viewUnfinishedChallenges(const ChallengeManager& templateManager) c
 		}
 
 		const ChallengeTemplate* tmpl = templateManager.getById(progress.getTemplateId());
-		if (!tmpl) continue;
+		if (!tmpl) {
+			continue;
+		}
 
 		hasAny = true;
 		std::cout << "Challenge: " << tmpl->getTitle() << std::endl;
@@ -372,15 +374,16 @@ void Player::viewFinishedChallenges(const ChallengeManager& templateManager) con
 		std::cout << "--------------------------" << std::endl;
 	}
 
-	if (!hasAny)
+	if (!hasAny) {
 		std::cout << "No finished challenges." << std::endl;
+	}
 }
 
 
 void Player::viewUser(const MyString& userName, const UserManager& userManager) const {
 	const User* user = userManager.findPlayerByUserName(userName);
 	if (!user) {
-		std::cout << "User with username \"" << userName << "\" not found.!";
+		std::cout << userName << " not found.!";
 		return;
 	}
 
@@ -415,7 +418,7 @@ void Player::startQuiz(size_t quizId, const MyString& mode, bool shuffle) {
 
 	Quiz* quiz = quizManager->getQuizById(quizId);
 	if (!quiz) {
-		std::cout << "Quiz with ID " << quizId << " not found!" << std::endl;
+		std::cout << "Quiz with ID [" << quizId << "] not found!" << std::endl;
 		return;
 	}
 
@@ -455,7 +458,7 @@ void Player::saveQuizToFile(size_t quizId, const MyString& filepath) const {
 
 	const Quiz* quiz = quizManager->getQuizById(quizId);
 	if (!quiz) {
-		std::cout << "Quiz with ID " << quizId << " not found!" << std::endl;
+		std::cout << "Quiz with ID [" << quizId << "] not found!" << std::endl;
 		return;
 	}
 
@@ -595,17 +598,17 @@ void Player::save() const {
 	out << this->getPoints() << std::endl;
 	out << this->getLevel() << std::endl;
 
-	out << "CreatedQuizIds: " << this->createdQuizzes.getVectorSize() << std::endl;
+	out << "Created Quiz Ids: " << this->createdQuizzes.getVectorSize() << std::endl;
 	for (size_t i = 0; i < this->createdQuizzes.getVectorSize(); ++i) {
 		out << createdQuizzes[i]->getQuizId() << std::endl;
 	}
 
-	out << "LikedQuizIds: " << this->likedQuizzes.getVectorSize() << std::endl;
+	out << "Liked Quiz Ids: " << this->likedQuizzes.getVectorSize() << std::endl;
 	for (size_t i = 0; i < this->likedQuizzes.getVectorSize(); ++i) {
 		out << likedQuizzes[i]->getQuizId() << std::endl;
 	}
 
-	out << "FavouriteQuizIds: " << this->favouriteQuizzes.getVectorSize() << std::endl;
+	out << "Favourite Quiz Ids: " << this->favouriteQuizzes.getVectorSize() << std::endl;
 	for (size_t i = 0; i < this->favouriteQuizzes.getVectorSize(); ++i) {
 		out << favouriteQuizzes[i]->getQuizId() << std::endl;
 	}
@@ -617,7 +620,7 @@ void Player::save() const {
 		}
 	}
 
-	out << "UnfinishedChallenges: " << unfinishedCount << std::endl;
+	out << "Unfinished Challenges: " << unfinishedCount << std::endl;
 	for (size_t i = 0; i < this->challenges.getVectorSize(); ++i) {
 		if (!this->challenges[i].getIsCompleted()) {
 			this->challenges[i].print(out);
@@ -632,7 +635,7 @@ void Player::save() const {
 		}
 	}
 
-	out << "FinishedChallenges: " << finishedCount << std::endl;
+	out << "Finished Challenges: " << finishedCount << std::endl;
 	for (size_t i = 0; i < this->challenges.getVectorSize(); ++i)
 		if (challenges[i].getIsCompleted()) {
 			challenges[i].print(out);
@@ -672,16 +675,16 @@ void Player::load(std::ifstream& in, QuizManager& quizManager) {
 	in >> level;
 	this->setLevel(level);
 
-	in.ignore(1000000, '\n');
+	in.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 
 	int createdCount = 0;
 	in >> createdCount;
-	in.ignore(1000000, '\n');
+	in.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 	this->createdQuizzes.clear();
 	for (int i = 0; i < createdCount; ++i) {
 		int quizId;
 		in >> quizId;
-		in.ignore(1000000, '\n');
+		in.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 
 		Quiz* quizPtr = quizManager.getQuizById(quizId);
 		if (quizPtr != nullptr) {
@@ -691,12 +694,12 @@ void Player::load(std::ifstream& in, QuizManager& quizManager) {
 
 	int likedCount = 0;
 	in >> likedCount;
-	in.ignore(1000000, '\n');
+	in.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 	this->likedQuizzes.clear();
 	for (int i = 0; i < likedCount; ++i) {
 		int quizId;
 		in >> quizId;
-		in.ignore(1000000, '\n');
+		in.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 
 		Quiz* quizPtr = quizManager.getQuizById(quizId);
 		if (quizPtr != nullptr) {
@@ -706,12 +709,12 @@ void Player::load(std::ifstream& in, QuizManager& quizManager) {
 
 	int favouriteCount = 0;
 	in >> favouriteCount;
-	in.ignore(1000000, '\n');
+	in.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 	this->favouriteQuizzes.clear();
 	for (int i = 0; i < favouriteCount; ++i) {
 		int quizId;
 		in >> quizId;
-		in.ignore(1000000, '\n');
+		in.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 
 		Quiz* quizPtr = quizManager.getQuizById(quizId);
 		if (quizPtr != nullptr) {
@@ -721,7 +724,7 @@ void Player::load(std::ifstream& in, QuizManager& quizManager) {
 
 	size_t challengesCount = 0;
 	in >> challengesCount;
-	in.ignore(1000000, '\n');
+	in.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 	this->challenges.clear();
 	for (size_t i = 0; i < challengesCount; ++i) {
 		ChallengeProgress cp;
@@ -732,19 +735,19 @@ void Player::load(std::ifstream& in, QuizManager& quizManager) {
 
 Question* Player::createTFQuestion() {
 	std::cout << "Enter the question text:" << std::endl;
-	char questionTextBufferTF[MAX_BUFFER_SIZE];
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	std::cin.getline(questionTextBufferTF, MAX_BUFFER_SIZE);
+	char questionTextBufferTF[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	std::cin.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
+	std::cin.getline(questionTextBufferTF, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString questionText(questionTextBufferTF);
 
 	std::cout << "Enter total points for this question: " << std::endl;
 	size_t totalPoints;
 	std::cin >> totalPoints;
-	std::cin.ignore(10000, '\n');
+	std::cin.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
 
 	std::cout << "Enter the correct answer (true/false):" << std::endl;
-	char correctAnswerBufferTF[MAX_BUFFER_SIZE];
-	std::cin.getline(correctAnswerBufferTF, MAX_BUFFER_SIZE);
+	char correctAnswerBufferTF[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	std::cin.getline(correctAnswerBufferTF, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString correctAnswerStr(correctAnswerBufferTF);
 
 	bool correctAnswerBool = false;
@@ -763,8 +766,8 @@ Question* Player::createTFQuestion() {
 
 Question* Player::createSCQuestion() {
 	std::cout << "Enter the question text:" << std::endl;
-	char questionTextBufferSC[MAX_BUFFER_SIZE];
-	std::cin.getline(questionTextBufferSC, MAX_BUFFER_SIZE);
+	char questionTextBufferSC[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	std::cin.getline(questionTextBufferSC, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString questionText(questionTextBufferSC);
 
 	std::cout << "Enter total points for this question: " << std::endl;
@@ -772,25 +775,25 @@ Question* Player::createSCQuestion() {
 	std::cin >> totalPoints;
 	std::cin.ignore();
 
-	char bufferAnswerA[MAX_BUFFER_SIZE];
-	char bufferAnswerB[MAX_BUFFER_SIZE];
-	char bufferAnswerC[MAX_BUFFER_SIZE];
-	char bufferAnswerD[MAX_BUFFER_SIZE];
+	char bufferAnswerA[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	char bufferAnswerB[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	char bufferAnswerC[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	char bufferAnswerD[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
 
 	std::cout << "Enter answer A:" << std::endl;
-	std::cin.getline(bufferAnswerA, MAX_BUFFER_SIZE);
+	std::cin.getline(bufferAnswerA, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString answerA(bufferAnswerA);
 
 	std::cout << "Enter answer B:" << std::endl;
-	std::cin.getline(bufferAnswerB, MAX_BUFFER_SIZE);
+	std::cin.getline(bufferAnswerB, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString answerB(bufferAnswerB);
 
 	std::cout << "Enter answer C:" << std::endl;
-	std::cin.getline(bufferAnswerC, MAX_BUFFER_SIZE);
+	std::cin.getline(bufferAnswerC, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString answerC(bufferAnswerC);
 
 	std::cout << "Enter answer D:" << std::endl;
-	std::cin.getline(bufferAnswerD, MAX_BUFFER_SIZE);
+	std::cin.getline(bufferAnswerD, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString answerD(bufferAnswerD);
 
 	std::cout << "Enter the correct answer (A/B/C/D):" << std::endl;
@@ -812,8 +815,8 @@ Question* Player::createSCQuestion() {
 
 Question* Player::createMCQuestion() {
 	std::cout << "Enter the question text:" << std::endl;
-	char questionTextBufferMC[MAX_BUFFER_SIZE];
-	std::cin.getline(questionTextBufferMC, MAX_BUFFER_SIZE);
+	char questionTextBufferMC[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	std::cin.getline(questionTextBufferMC, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString questionText(questionTextBufferMC);
 
 	std::cout << "Enter total points for this question:" << std::endl;
@@ -834,16 +837,16 @@ Question* Player::createMCQuestion() {
 		numOptions = 4;
 	}
 
-	char buffer[MAX_BUFFER_SIZE];
+	char buffer[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
 	for (size_t i = 0; i < numOptions; ++i) {
 		std::cout << "Enter option " << optionLabels[i] << ":" << std::endl;
-		std::cin.getline(buffer, MAX_BUFFER_SIZE);
+		std::cin.getline(buffer, MAX_BUFFER_SIZE_PLAYER_CLASS);
 		options.pushBack(MyString(buffer));
 	}
 
 	std::cout << "Enter the correct answer letters (e.g., AC for options A and C):" << std::endl;
-	char correctAnswersBuffer[MAX_BUFFER_SIZE];
-	std::cin.getline(correctAnswersBuffer, MAX_BUFFER_SIZE);
+	char correctAnswersBuffer[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	std::cin.getline(correctAnswersBuffer, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString correctAnswersStr(correctAnswersBuffer);
 
 	MyVector<char> correctAnswers;
@@ -864,9 +867,9 @@ Question* Player::createMCQuestion() {
 
 Question* Player::createShAQuestion() {
 	std::cout << "Enter the question text:" << std::endl;
-	char questionTextBufferShA[MAX_BUFFER_SIZE];
+	char questionTextBufferShA[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
 	std::cin.ignore();
-	std::cin.getline(questionTextBufferShA, MAX_BUFFER_SIZE);
+	std::cin.getline(questionTextBufferShA, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString questionText(questionTextBufferShA);
 
 	std::cout << "Enter total points for this question:" << std::endl;
@@ -875,8 +878,8 @@ Question* Player::createShAQuestion() {
 	std::cin.ignore();
 
 	std::cout << "Enter the correct short answer:" << std::endl;
-	char correctAnswerBufferShA[MAX_BUFFER_SIZE];
-	std::cin.getline(correctAnswerBufferShA, MAX_BUFFER_SIZE);
+	char correctAnswerBufferShA[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	std::cin.getline(correctAnswerBufferShA, MAX_BUFFER_SIZE_PLAYER_CLASS + 1);
 	MyString correctAnswer(correctAnswerBufferShA);
 
 	return new ShortAnswerQuestion(questionText, totalPoints, correctAnswer);
@@ -884,9 +887,9 @@ Question* Player::createShAQuestion() {
 
 Question* Player::createMPQuestion() {
 	std::cout << "Enter the question text:" << std::endl;
-	char questionTextBufferMP[MAX_BUFFER_SIZE];
+	char questionTextBufferMP[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
 	std::cin.ignore();
-	std::cin.getline(questionTextBufferMP, MAX_BUFFER_SIZE);
+	std::cin.getline(questionTextBufferMP, MAX_BUFFER_SIZE_PLAYER_CLASS + 1);
 	MyString questionText(questionTextBufferMP);
 
 	std::cout << "Enter total points for this question:" << std::endl;
@@ -903,22 +906,22 @@ Question* Player::createMPQuestion() {
 	std::cout << "Enter items for the LEFT column:" << std::endl;
 	for (size_t i = 0; i < pairCount; ++i) {
 		std::cout << "Left[" << i + 1 << "]: ";
-		char buffer[MAX_BUFFER_SIZE];
-		std::cin.getline(buffer, MAX_BUFFER_SIZE);
+		char buffer[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+		std::cin.getline(buffer, MAX_BUFFER_SIZE_PLAYER_CLASS);
 		leftColumn.pushBack(MyString(buffer));
 	}
 
 	std::cout << "Enter items for the RIGHT column:" << std::endl;
 	for (size_t i = 0; i < pairCount; ++i) {
 		std::cout << "Right[" << i + 1 << "]: ";
-		char buffer[MAX_BUFFER_SIZE];
-		std::cin.getline(buffer, MAX_BUFFER_SIZE);
+		char buffer[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+		std::cin.getline(buffer, MAX_BUFFER_SIZE_PLAYER_CLASS);
 		rightColumn.pushBack(MyString(buffer));
 	}
 
 	std::cout << "Enter the correct answers as a sequence of matching positions (e.g. 1-3 2-1 3-2):" << std::endl;
-	char answerBufferMP[MAX_BUFFER_SIZE];
-	std::cin.getline(answerBufferMP, MAX_BUFFER_SIZE);
+	char answerBufferMP[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
+	std::cin.getline(answerBufferMP, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString correctAnswers(answerBufferMP);
 
 	return new MatchingPairsQuestion(questionText, totalPoints, rightColumn, leftColumn, correctAnswers);

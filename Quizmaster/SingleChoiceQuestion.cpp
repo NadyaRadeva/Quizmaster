@@ -75,16 +75,45 @@ void SingleChoiceQuestion::loadFromFile(std::ifstream& file) {
 		throw std::invalid_argument("Error opening file for reading!");
 	}
 
-	MyString questionText = MyString().readLine(file);
-	MyString totalPointsStr = MyString().readLine(file);
-	MyString answerA = MyString().readLine(file);
-	MyString answerB = MyString().readLine(file);
-	MyString answerC = MyString().readLine(file);
-	MyString answerD = MyString().readLine(file);
-	MyString correctLetterLine = MyString().readLine(file);
+	char buffer[MAX_SIZE_SINGLE_CHOICE_BUFFER + 1];
+
+	if (!file.getline(buffer, MAX_SIZE_SINGLE_CHOICE_BUFFER)) {
+		throw std::runtime_error("Failed to read question text!");
+	}
+	MyString questionText(buffer);
+
+	if (!file.getline(buffer, MAX_SIZE_SINGLE_CHOICE_BUFFER)) {
+		throw std::runtime_error("Failed to read total points!");
+	}
+	MyString totalPointsStr(buffer);
+
+	if (!file.getline(buffer, MAX_SIZE_SINGLE_CHOICE_BUFFER)) {
+		throw std::runtime_error("Failed to read answer A!");
+	}
+	MyString answerA(buffer);
+
+	if (!file.getline(buffer, MAX_SIZE_SINGLE_CHOICE_BUFFER)) {
+		throw std::runtime_error("Failed to read answer B!");
+	}
+	MyString answerB(buffer);
+
+	if (!file.getline(buffer, MAX_SIZE_SINGLE_CHOICE_BUFFER)) {
+		throw std::runtime_error("Failed to read answer C!");
+	}
+	MyString answerC(buffer);
+
+	if (!file.getline(buffer, MAX_SIZE_SINGLE_CHOICE_BUFFER)) {
+		throw std::runtime_error("Failed to read answer D!");
+	}
+	MyString answerD(buffer);
+
+	if (!file.getline(buffer, MAX_SIZE_SINGLE_CHOICE_BUFFER)) {
+		throw std::runtime_error("Failed to read correct answer letter!");
+	}
+	MyString correctLetterLine(buffer);
 
 	if (correctLetterLine.getLength() != 1) {
-		throw std::invalid_argument("Invalid format for correct answer letter.");
+		throw std::invalid_argument("Invalid format for correct answer letter!");
 	}
 
 	this->setQuestionText(questionText);

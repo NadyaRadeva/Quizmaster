@@ -29,7 +29,7 @@ double ShortAnswerQuestion::answerEvaluation() {
     char buffer[MAX_LEN_SHORT_ANSWER_BUFFER + 1];
 
     std::cout << "Enter your short answer: ";
-    std::cin.getline(buffer, MAX_LEN_SHORT_ANSWER_BUFFER + 1);
+    std::cin.getline(buffer, MAX_LEN_SHORT_ANSWER_BUFFER);
     userInput = MyString(buffer);
 
     MyString lowerShortCorrectAnswer = correctShortAnswer.toLower();
@@ -62,9 +62,22 @@ void ShortAnswerQuestion::loadFromFile(std::ifstream& file) {
         throw std::invalid_argument("Error opening file for reading!");
     }
 
-    MyString questionText = MyString().readLine(file);
-    MyString totalPointsStr = MyString().readLine(file);
-    MyString correctAnswer = MyString().readLine(file);
+    char buffer[MAX_LEN_SHORT_ANSWER_BUFFER + 1];
+
+    if (!file.getline(buffer, MAX_LEN_SHORT_ANSWER_BUFFER)) {
+        throw std::runtime_error("Failed to read question text!");
+    }
+    MyString questionText(buffer);
+
+    if (!file.getline(buffer, MAX_LEN_SHORT_ANSWER_BUFFER)) {
+        throw std::runtime_error("Failed to read total points!");
+    }
+    MyString totalPointsStr(buffer);
+
+    if (!file.getline(buffer, MAX_LEN_SHORT_ANSWER_BUFFER)) {
+        throw std::runtime_error("Failed to read correct answer!");
+    }
+    MyString correctAnswer(buffer);
 
     this->setQuestionText(questionText);
     this->setTotalPoints(totalPointsStr.toInt());

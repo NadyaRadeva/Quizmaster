@@ -110,16 +110,29 @@ void ChallengeProgress::print(std::ostream& os) const {
 }
 
 void ChallengeProgress::load(std::istream& in) {
-	MyString line;
+	char buffer[MAX_BUFFER_SIZE_CHALLENGE_PROGRESS + 1];
 
-	this->templateId = line.readLine(in);
+	if (!in.getline(buffer, sizeof(buffer))) {
+		return;
+	}
+	MyString line(buffer);
+	this->templateId = line;
 
-	line = line.readLine(in);
+	if (!in.getline(buffer, sizeof(buffer))) {
+		return;
+	}
+	line = MyString(buffer);
 	this->progress = line.toInt();
 
-	line = line.readLine(in);
+	if (!in.getline(buffer, sizeof(buffer))) {
+		return;
+	}
+	line = MyString(buffer);
 	this->isCompleted = (line.toInt() != 0);
 
-	line = line.readLine(in);
+	if (!in.getline(buffer, sizeof(buffer))) {
+		return;
+	}
+	line = MyString(buffer);
 	this->timeCompleted = static_cast<time_t>(line.toInt());
 }

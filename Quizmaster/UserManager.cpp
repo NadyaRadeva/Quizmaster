@@ -87,37 +87,57 @@ bool UserManager::signupPlayer(const MyString& firstName, const MyString& lastNa
 }
 
 User* UserManager::login(const MyString& username, const MyString& password) {
-	//for (size_t i = 0; i < this->allUsers.getVectorSize(); ++i) {
-	//	if (this->allUsers[i]->getUserName() == username && this->allUsers[i]->getUserPassword() == password) {
-	//		this->currentUser = this->allUsers[i];
-	//		return this->currentUser;
-	//	}
-	//}
+	std::ifstream in("Users.txt");
+	if (!in.is_open()) {
+		std::cerr << "Could not open Users.txt for reading!";
+		return nullptr;
+	}
 
-	//std::cout << "[DEBUG] Login failed for username: " << username
-	//	<< ", password: " << password << std::endl;
+	char buffer[MAX_BUFFER_SIZE_USER_MANAGER_CLASS + 1];
 
-	for (size_t i = 0; i < this->allUsers.getVectorSize(); ++i) {
-		const MyString& storedUser = this->allUsers[i]->getUserName();
-		const MyString& storedPass = this->allUsers[i]->getUserPassword();
+	while (in.getline(buffer, sizeof(buffer))) {
+		MyString line(buffer);
 
-		std::cout << "[DEBUG] Comparing storedUser: '" << storedUser.toChar()
-			<< "' with inputUser: '" << username.toChar() << "'\n";
-		std::cout << "[DEBUG] Comparing storedPass: '" << storedPass.toChar()
-			<< "' with inputPass: '" << password.toChar() << "'\n";
+		if (line.getLength() == 0)
+			continue;
 
-		if (storedUser == username && storedPass == password) {
-			this->currentUser = this->allUsers[i];
-			return this->currentUser;
+		MyVector<MyString> words;
+
+		size_t start = 0;
+		for (size_t i = 0; i <= line.getLength(); ++i) {
+			if (i == line.getLength() || line[i] == ' ') {
+				if (i > start) {
+					MyString word = line.subStr(start, i - start);
+					words.pushBack(word);
+				}
+				start = i + 1;
+			}
+		}
+
+		if (words.getVectorSize() >= 5) {
+			MyString fileUsername = words[3].trim();
+			MyString filePassword = words[4].trim();
+
+			if (fileUsername == username && filePassword == password) {
+				for (size_t i = 0; i < this->allUsers.getVectorSize(); ++i) {
+					if (this->allUsers[i]->getUserName() == username &&
+						this->allUsers[i]->getUserPassword() == password) {
+						this->currentUser = this->allUsers[i];
+						return this->currentUser;
+					}
+				}
+			}
 		}
 	}
 
+	std::cout << "Login failed for username: " << username.toChar() << std::endl;
 	return nullptr;
 }
 
+
 void UserManager::logout() {
 	if (this->currentUser) {
-		std::cout << "User " << this->currentUser->getUserName() << " logged out." << std::endl;
+		std::cout << "User " << this->currentUser->getUserName() << " logged out!" << std::endl;
 		this->currentUser = nullptr;
 	}
 	else {
@@ -170,7 +190,9 @@ Player* UserManager::findPlayerByUserName(const MyString& userName) const {
 
 void UserManager::saveAllUsersToFile(const char* filename) const {
 	std::ofstream out(filename);
-	if (!out.is_open()) return;
+	if (!out.is_open()) {
+		return;
+	}
 
 	out << this->allUsers.getVectorSize() << std::endl;
 

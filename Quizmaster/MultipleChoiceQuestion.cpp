@@ -174,8 +174,9 @@ void MultipleChoiceQuestion::loadFromFile(std::ifstream& file) {
         throw std::invalid_argument("Error opening file for reading!");
     }
 
-    MyString questionText;
-    readLineFromFile(file, questionText);
+    char buffer[MAX_LEN_MULTIPLE_CHOICE_BUFFER + 1];
+    file.getline(buffer, MAX_LEN_MULTIPLE_CHOICE_BUFFER);
+    MyString questionText(buffer);
     this->setQuestionText(questionText);
 
     int points = 0;
@@ -189,14 +190,13 @@ void MultipleChoiceQuestion::loadFromFile(std::ifstream& file) {
 
     MyVector<MyString> options;
     for (size_t i = 0; i < optionsCount; ++i) {
-        MyString option;
-        readLineFromFile(file, option);
-        options.pushBack(option);
+        file.getline(buffer, MAX_LEN_MULTIPLE_CHOICE_BUFFER);
+        options.pushBack(MyString(buffer));
     }
     this->setOptions(options);
 
-    MyString correctAnsLine;
-    readLineFromFile(file, correctAnsLine);
+    file.getline(buffer, MAX_LEN_MULTIPLE_CHOICE_BUFFER);
+    MyString correctAnsLine(buffer);
 
     MyVector<char> correctAnsVec;
     for (size_t i = 0; i < correctAnsLine.getLength(); ++i) {
@@ -208,6 +208,7 @@ void MultipleChoiceQuestion::loadFromFile(std::ifstream& file) {
             correctAnsVec.pushBack(c);
         }
     }
+
     this->setCorrectAnswers(correctAnsVec);
 }
 

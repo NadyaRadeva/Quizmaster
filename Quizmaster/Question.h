@@ -7,7 +7,7 @@
 #include <iostream>
 #include<stdexcept>
 
-const size_t MAX_LEN_QUESTION_BUFFER = 3000;
+const size_t MAX_LEN_QUESTION_BUFFER = 10000;
 
 class Question {
 public:
