@@ -67,10 +67,26 @@ void Message::save(std::ofstream& out) const {
 }
 
 void Message::load(std::ifstream& in) {
-	MyString senderUsername, receiverUsername;
-	content.readLine(in);
-	senderUsername.readLine(in);
-	receiverUsername.readLine(in);
+	if (!in.is_open()) {
+		throw std::invalid_argument("File is not open for reading!");
+	}
+
+	char buffer[MAX_MESSAGE_BUFFER + 1];
+
+	if (!in.getline(buffer, MAX_MESSAGE_BUFFER)) {
+		throw std::runtime_error("Failed to read message content!");
+	}
+	content = MyString(buffer);
+
+	if (!in.getline(buffer, MAX_MESSAGE_BUFFER + 1)) {
+		throw std::runtime_error("Failed to read sender username!");
+	}
+	MyString senderUsername(buffer);
+
+	if (!in.getline(buffer, MAX_MESSAGE_BUFFER)) {
+		throw std::runtime_error("Failed to read receiver username!");
+	}
+	MyString receiverUsername(buffer);
 
 	sender = nullptr;
 	receiver = nullptr;

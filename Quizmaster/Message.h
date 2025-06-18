@@ -5,6 +5,8 @@
 #include "User.h"
 #include<stdexcept>
 
+const int MAX_MESSAGE_BUFFER = 10000;
+
 class User;
 
 class Message {
