@@ -1,3 +1,7 @@
-Player Nadya Radeva ngradeva 12345 0 1
-Player Petar Petrov petpetrov 123 0 1
-Player Petar Petrov petpetrov 12345 0 1
+2
+2
+admin
+admin
+admin
+admin
+1

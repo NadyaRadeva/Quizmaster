@@ -36,9 +36,9 @@ const QuizManager* Player::getQuizManager() const {
 }
 
 Quiz* Player::addCreatedQuiz(const MyString& title) {
-	if (!quizManager) {
+	/*if (!quizManager) {
 		throw std::runtime_error("QuizManager is not set!");
-	}
+	}*/
 
 	std::cout << "Enter number of questions: ";
 	int n;
@@ -735,8 +735,8 @@ void Player::load(std::ifstream& in, QuizManager& quizManager) {
 
 Question* Player::createTFQuestion() {
 	std::cout << "Enter the question text:" << std::endl;
-	char questionTextBufferTF[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
 	std::cin.ignore(MAX_BUFFER_SIZE_PLAYER_CLASS, '\n');
+	char questionTextBufferTF[MAX_BUFFER_SIZE_PLAYER_CLASS + 1];
 	std::cin.getline(questionTextBufferTF, MAX_BUFFER_SIZE_PLAYER_CLASS);
 	MyString questionText(questionTextBufferTF);
 
